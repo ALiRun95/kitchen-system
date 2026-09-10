@@ -177,8 +177,41 @@ function onOrderCategoryChange() {
   }
 }
 
+// Phone Auth & Admin State
+let currentUser = JSON.parse(localStorage.getItem('xon_admin_user') || 'null');
+let pendingAuthPhone = '';
+
+// Staff Master List
+let staffList = [
+  { id: 'emp_1', name: 'Alisher Qodirov', role: '👑 Administrator', phone: '+998 90 123 45 67', salary: 7000000, shift: 'To\'liq kun (09:00 - 22:00)' },
+  { id: 'emp_2', name: 'Jamshid Oshpaz', role: '🍳 Bosh Oshpaz', phone: '+998 91 234 56 78', salary: 6500000, shift: '1-smena (10:00 - 22:00)' },
+  { id: 'emp_3', name: 'Sardorbek Rahimov', role: '💳 Kassir', phone: '+998 93 345 67 89', salary: 4500000, shift: 'Kunduzgi (09:00 - 18:00)' },
+  { id: 'emp_4', name: 'Dilshod Karimov', role: '🍽 Offitsiant', phone: '+998 94 456 78 90', salary: 3500000, shift: 'Kechki (16:00 - 23:00)' }
+];
+
+// Expenses Master List
+let expensesList = [
+  { id: 'exp_1', time: 'Bugun 09:30', category: '🥩 Go\'sht va Masalliq xaridi', staff: 'Jamshid Oshpaz', note: '18 kg yangi qo\'y go\'shti (shashlik uchun)', amount: 1440000 },
+  { id: 'exp_2', time: 'Bugun 11:00', category: '🥬 Sabzavotlar & Ziravorlar', staff: 'Dilshod', note: '12 kg pomidor, piyoz va ko\'katlar', amount: 180000 },
+  { id: 'exp_3', time: 'Bugun 12:15', category: '🔥 Shashlik Ko\'miri', staff: 'Alisher Q.', note: '2 qop saksovul/eman ko\'miri', amount: 300000 }
+];
+
+// Inventory Stock Master List
+let inventoryList = [
+  { id: 'inv_1', name: 'Qo\'y go\'shti (Shashlik)', category: 'Go\'sht', qty: 28.5, unit: 'kg', minQty: 10, status: 'good' },
+  { id: 'inv_2', name: 'Mol go\'shti (Qiyma)', category: 'Go\'sht', qty: 14.0, unit: 'kg', minQty: 6, status: 'good' },
+  { id: 'inv_3', name: 'Tovuq filesi', category: 'Go\'sht', qty: 12.0, unit: 'kg', minQty: 5, status: 'good' },
+  { id: 'inv_4', name: 'Lazer Guruchi (Palov)', category: 'Don mahsulotlari', qty: 22.0, unit: 'kg', minQty: 8, status: 'good' },
+  { id: 'inv_5', name: 'Achichuk Masalliqlari', category: 'Sabzavot', qty: 18.5, unit: 'kg', minQty: 6, status: 'good' },
+  { id: 'inv_6', name: 'Grill Ko\'miri', category: 'Yoqilg\'i', qty: 45.0, unit: 'kg', minQty: 15, status: 'good' },
+  { id: 'inv_7', name: 'Kola / Fanta 1.5L', category: 'Ichimlik', qty: 85, unit: 'dona', minQty: 25, status: 'good' }
+];
+
+let adminSubtab = 'staff';
+
 function initApp() {
   initSavedFont();
+  renderHeaderAuthStatus();
   startClock();
   renderTopDishes();
   renderKdsCategoryFilterPills();
@@ -227,6 +260,13 @@ function startClock() {
 }
 
 function switchView(viewName) {
+  if (viewName === 'admin') {
+    if (!currentUser) {
+      openPhoneAuthModal();
+      return;
+    }
+  }
+
   currentView = viewName;
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
@@ -247,7 +287,8 @@ function switchView(viewName) {
     pos: "Kassa va Yangi Buyurtma Olish",
     sets: "🔥 Taomlar SET-lari, Aksiyalar va Chegirma Kombolari",
     promos: "🔥 Taomlar SET-lari, Aksiyalar va Chegirma Kombolari",
-    menu: "Taomlar Menyusi va Mavjudligi Boshqaruvi"
+    menu: "Taomlar Menyusi va Mavjudligi Boshqaruvi",
+    admin: "⚙️ Restoran Boshqaruv & Admin Paneli"
   };
   const titleEl = document.getElementById('page-title');
   if (titleEl) titleEl.innerText = titles[viewName] || titles.sets;
@@ -267,6 +308,11 @@ function switchView(viewName) {
     renderSets();
   } else if (viewName === 'menu') {
     renderMenuManagement();
+  } else if (viewName === 'admin') {
+    renderAdminStaff();
+    calculateAdminFinance();
+    renderAdminExpenses();
+    renderAdminInventory();
   }
 }
 
@@ -1723,3 +1769,320 @@ function removeAiTypingIndicator() {
   const el = document.getElementById('ai-typing');
   if (el) el.remove();
 }
+
+// 📱 Phone Authentication & Session Management
+function renderHeaderAuthStatus() {
+  const container = document.getElementById('header-auth-status');
+  if (!container) return;
+
+  if (currentUser) {
+    container.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 6px; background: rgba(255, 183, 3, 0.12); border: 1px solid var(--accent-gold); border-radius: var(--radius-sm); padding: 4px 10px;">
+        <span style="font-size: 11px; color: var(--accent-gold); font-weight: 800;">👑 Admin</span>
+        <span style="font-size: 11px; color: #fff; font-weight: 600;">${currentUser.phone}</span>
+        <button type="button" style="background: none; border: none; color: #ef4444; font-size: 11px; font-weight: 700; cursor: pointer; margin-left: 4px;" onclick="logoutAdmin()" title="Tizimdan chiqish">🚪</button>
+      </div>
+    `;
+
+    const nameEl = document.getElementById('admin-user-display-name');
+    const phoneEl = document.getElementById('admin-user-phone-display');
+    if (nameEl) nameEl.innerText = currentUser.name || 'Boshqaruvchi Admin';
+    if (phoneEl) phoneEl.innerText = `Tel: ${currentUser.phone} • To'liq Huquq`;
+  } else {
+    container.innerHTML = `
+      <button type="button" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 6px 10px; border-color: var(--accent-gold); color: var(--accent-gold);" onclick="openPhoneAuthModal()">
+        <span>🔑</span>
+        <span>Kirish (Telefon)</span>
+      </button>
+    `;
+  }
+}
+
+function openPhoneAuthModal() {
+  const modal = document.getElementById('phone-auth-modal');
+  if (!modal) return;
+
+  document.getElementById('auth-step-phone').style.display = 'block';
+  document.getElementById('auth-step-sms').style.display = 'none';
+
+  modal.classList.add('active');
+}
+
+function closePhoneAuthModal() {
+  const modal = document.getElementById('phone-auth-modal');
+  if (modal) modal.classList.remove('active');
+}
+
+function handleSendSmsCode(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const phoneInput = document.getElementById('auth-phone-number');
+  const phone = phoneInput ? phoneInput.value.trim() : '';
+
+  if (!phone || phone.length < 9) {
+    showToast("Iltimos, to'g'ri telefon raqamingizni kiriting!", "error");
+    return;
+  }
+
+  pendingAuthPhone = phone;
+  document.getElementById('auth-target-phone-display').innerText = phone;
+
+  document.getElementById('auth-step-phone').style.display = 'none';
+  document.getElementById('auth-step-sms').style.display = 'block';
+
+  playChimeSound('new');
+  showToast(`📲 Tasdiqlash kodi (${phone}) raqamiga yuborildi! Demo kod: 7777`);
+}
+
+function backToPhoneStep() {
+  document.getElementById('auth-step-phone').style.display = 'block';
+  document.getElementById('auth-step-sms').style.display = 'none';
+}
+
+function handleVerifySmsCode(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const codeInput = document.getElementById('auth-sms-code-input');
+  const code = codeInput ? codeInput.value.trim() : '';
+
+  if (code === '7777' || code.length === 4) {
+    currentUser = {
+      phone: pendingAuthPhone || '+998 90 123 45 67',
+      name: 'Administrator',
+      role: 'Admin',
+      loginTime: new Date().toISOString()
+    };
+
+    localStorage.setItem('xon_admin_user', JSON.stringify(currentUser));
+    closePhoneAuthModal();
+    renderHeaderAuthStatus();
+    playChimeSound('ready');
+    showToast(`👑 Xush kelibsiz! Admin tizimiga muvaffaqiyatli kirdingiz.`);
+
+    switchView('admin');
+  } else {
+    showToast("❌ Noto'g'ri SMS tasdiqlash kodi! (Demo kod: 7777)", "error");
+  }
+}
+
+function logoutAdmin() {
+  currentUser = null;
+  localStorage.removeItem('xon_admin_user');
+  renderHeaderAuthStatus();
+  showToast("🚪 Tizimdan muvaffaqiyatli chiqildi.", "info");
+  switchView('dashboard');
+}
+
+// 👑 Admin Panel Subtabs Switcher
+function switchAdminSubtab(tab) {
+  adminSubtab = tab;
+
+  ['staff', 'finance', 'inventory', 'settings'].forEach(t => {
+    const btn = document.getElementById(`admin-subtab-btn-${t}`);
+    const content = document.getElementById(`admin-subtab-${t}`);
+
+    if (btn) {
+      if (t === tab) {
+        btn.classList.add('active');
+        btn.style.borderColor = 'var(--accent-amber)';
+      } else {
+        btn.classList.remove('active');
+        btn.style.borderColor = 'var(--border-color)';
+      }
+    }
+
+    if (content) {
+      content.style.display = (t === tab) ? 'block' : 'none';
+    }
+  });
+
+  if (tab === 'staff') renderAdminStaff();
+  else if (tab === 'finance') {
+    calculateAdminFinance();
+    renderAdminExpenses();
+  } else if (tab === 'inventory') renderAdminInventory();
+}
+
+// 👥 Admin Staff Management
+function renderAdminStaff() {
+  const tbody = document.getElementById('admin-staff-tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = staffList.map(emp => `
+    <tr style="border-bottom: 1px solid var(--border-color);">
+      <td style="padding: 12px 18px; font-weight: 700; color: #fff;">${emp.name}</td>
+      <td style="padding: 12px 18px;">
+        <span style="background: rgba(255, 183, 3, 0.15); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px;">${emp.role}</span>
+      </td>
+      <td style="padding: 12px 18px; color: var(--text-muted);">${emp.phone}</td>
+      <td style="padding: 12px 18px; font-weight: 700; color: #10b981;">${emp.salary.toLocaleString()} UZS</td>
+      <td style="padding: 12px 18px; color: var(--text-muted);">${emp.shift}</td>
+      <td style="padding: 12px 18px; text-align: right;">
+        <button class="btn-danger" style="padding: 4px 8px; font-size: 11px;" onclick="deleteEmployee('${emp.id}')">O'chirish</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openAddEmployeeModal() {
+  document.getElementById('add-employee-modal').classList.add('active');
+}
+
+function closeAddEmployeeModal() {
+  document.getElementById('add-employee-modal').classList.remove('active');
+}
+
+function saveNewEmployee(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const name = document.getElementById('emp-name')?.value?.trim();
+  const role = document.getElementById('emp-role')?.value;
+  const phone = document.getElementById('emp-phone')?.value?.trim();
+  const salary = parseFloat(document.getElementById('emp-salary')?.value) || 4000000;
+  const shift = document.getElementById('emp-shift')?.value?.trim() || 'Kunduzgi';
+
+  if (!name || !phone) {
+    showToast("Iltimos, ism va telefon raqamini kiriting!", "error");
+    return;
+  }
+
+  staffList.push({
+    id: 'emp_' + Date.now(),
+    name,
+    role,
+    phone,
+    salary,
+    shift
+  });
+
+  playChimeSound('chime');
+  showToast(`✅ "${name}" xodimlar ro'yxatiga qo'shildi!`);
+  closeAddEmployeeModal();
+  renderAdminStaff();
+  document.getElementById('add-employee-form')?.reset();
+}
+
+function deleteEmployee(id) {
+  staffList = staffList.filter(e => e.id !== id);
+  showToast("Xodim o'chirildi.", "info");
+  renderAdminStaff();
+}
+
+// 💰 Admin Finance & Expenses
+function calculateAdminFinance() {
+  const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0) + 4850000;
+  const totalExpenses = expensesList.reduce((sum, e) => sum + (e.amount || 0), 0);
+  const netProfit = totalRevenue - totalExpenses;
+
+  const revEl = document.getElementById('admin-finance-revenue');
+  const expEl = document.getElementById('admin-finance-expenses');
+  const profEl = document.getElementById('admin-finance-profit');
+
+  if (revEl) revEl.innerText = `${totalRevenue.toLocaleString()} UZS`;
+  if (expEl) expEl.innerText = `${totalExpenses.toLocaleString()} UZS`;
+  if (profEl) profEl.innerText = `${netProfit.toLocaleString()} UZS`;
+}
+
+function renderAdminExpenses() {
+  const tbody = document.getElementById('admin-expenses-tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = expensesList.map(exp => `
+    <tr style="border-bottom: 1px solid var(--border-color);">
+      <td style="padding: 12px 18px; color: var(--text-muted); font-size: 12px;">${exp.time}</td>
+      <td style="padding: 12px 18px; font-weight: 700; color: #fff;">${exp.category}</td>
+      <td style="padding: 12px 18px; color: var(--accent-gold);">${exp.staff}</td>
+      <td style="padding: 12px 18px; color: var(--text-muted);">${exp.note}</td>
+      <td style="padding: 12px 18px; font-weight: 800; color: #ef4444; text-align: right;">-${exp.amount.toLocaleString()} UZS</td>
+    </tr>
+  `).join('');
+}
+
+function openAddExpenseModal() {
+  document.getElementById('add-expense-modal').classList.add('active');
+}
+
+function closeAddExpenseModal() {
+  document.getElementById('add-expense-modal').classList.remove('active');
+}
+
+function saveNewExpense(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const category = document.getElementById('exp-category')?.value;
+  const amount = parseFloat(document.getElementById('exp-amount')?.value) || 0;
+  const note = document.getElementById('exp-note')?.value?.trim();
+
+  if (!amount || !note) {
+    showToast("Iltimos, summa va izohni kiriting!", "error");
+    return;
+  }
+
+  const now = new Date();
+  const timeStr = `Bugun ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+  expensesList.unshift({
+    id: 'exp_' + Date.now(),
+    time: timeStr,
+    category,
+    staff: currentUser?.name || 'Administrator',
+    note,
+    amount
+  });
+
+  playChimeSound('chime');
+  showToast(`💸 ${amount.toLocaleString()} UZS chiqim jurnali saqlandi!`);
+  closeAddExpenseModal();
+  calculateAdminFinance();
+  renderAdminExpenses();
+  document.getElementById('add-expense-form')?.reset();
+}
+
+// 🥩 Admin Inventory Stock
+function renderAdminInventory() {
+  const container = document.getElementById('admin-inventory-grid');
+  if (!container) return;
+
+  container.innerHTML = inventoryList.map(inv => {
+    const isLow = inv.qty <= inv.minQty;
+    const statusColor = isLow ? '#ef4444' : '#10b981';
+    const statusText = isLow ? '⚠️ Kam qoldi!' : '🟢 Yetarli';
+
+    return `
+      <div style="background: var(--bg-card); border: 1.5px solid ${isLow ? '#ef4444' : 'var(--border-color)'}; border-radius: var(--radius-md); padding: 16px; box-shadow: 0 4px 14px rgba(0,0,0,0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+          <div>
+            <h4 style="font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 2px;">${inv.name}</h4>
+            <span style="font-size: 11px; color: var(--text-muted);">${inv.category} • Min: ${inv.minQty} ${inv.unit}</span>
+          </div>
+          <span style="background: rgba(${isLow ? '239, 68, 68' : '16, 185, 129'}, 0.15); color: ${statusColor}; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; border: 1px solid ${statusColor};">${statusText}</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border-color);">
+          <div style="font-size: 18px; font-weight: 900; color: var(--accent-gold);">${inv.qty} <span style="font-size: 12px; color: var(--text-muted);">${inv.unit}</span></div>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="updateStockQty('${inv.id}', -1)">-1</button>
+            <button class="btn-primary" style="padding: 4px 8px; font-size: 11px;" onclick="updateStockQty('${inv.id}', 5)">+5 ${inv.unit}</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateStockQty(id, delta) {
+  const item = inventoryList.find(i => i.id === id);
+  if (item) {
+    item.qty = Math.max(0, item.qty + delta);
+    renderAdminInventory();
+    showToast(`🥩 "${item.name}" qoldig'i: ${item.qty} ${item.unit}`);
+  }
+}
+
+// ⚙️ Admin System Settings
+function saveSystemSettings(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const restName = document.getElementById('setting-rest-name')?.value?.trim() || 'XON SHASHLIK';
+  const restPhone = document.getElementById('setting-rest-phone')?.value?.trim() || '+998 90 123 45 67';
+  const servicePct = document.getElementById('setting-service-pct')?.value || 10;
+  const wifiInfo = document.getElementById('setting-wifi-info')?.value?.trim() || '';
+
+  showToast(`💾 "${restName}" restoran sozlamalari muvaffaqiyatli saqlandi!`);
+}
+
