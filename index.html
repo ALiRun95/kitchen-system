@@ -88,7 +88,13 @@
         <div class="header-title">
           <h1 id="page-title">Sotuvlar Statistikasi va Analitika</h1>
         </div>
-        <div class="header-actions">
+        <div class="header-actions" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <!-- Sound Chime Toggle Button -->
+          <button type="button" class="btn-secondary" id="sound-toggle-btn" onclick="toggleAudioChime()" style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 7px 12px; border: 1px solid rgba(255, 69, 0, 0.4);">
+            <span id="sound-icon">🔊</span>
+            <span id="sound-text">Ovoz: Yoqilgan</span>
+          </button>
+          
           <div class="live-clock" id="live-clock">--:--:--</div>
           <button class="btn-primary" onclick="openNewOrderModal()">
             <span>+ Yangi Buyurtma</span>
@@ -115,8 +121,13 @@
               </div>
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="btn-secondary" onclick="exportDailySalesReportCSV()" style="padding: 10px 14px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; border-color: var(--accent-amber); color: var(--accent-amber);">
+                <span>📥</span> <span>Excel / CSV Hisobot</span>
+              </button>
+              <button class="btn-secondary" onclick="openReservationModal()" style="padding: 10px 14px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+                <span>📅</span> <span>Stol Bron Qilish</span>
+              </button>
               <button class="btn-primary" onclick="openNewOrderModal()" style="padding: 10px 18px; font-size: 13px; font-weight: 700;">+ Yangi Buyurtma</button>
-              <button class="btn-secondary" onclick="switchView('sets')" style="padding: 10px 16px; font-size: 13px;">🎁 SET & Aksiyalar</button>
             </div>
           </div>
         </div>
@@ -647,6 +658,71 @@
         <div style="display: flex; gap: 12px;">
           <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeAddOrderCategoryModal()">Bekor Qilish</button>
           <button type="submit" class="btn-primary" style="flex: 1;">Kategoriyani Saqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: QR Code Digital Menu Card (Dine-QR Integration) -->
+  <div class="modal-overlay" id="qr-menu-modal">
+    <div class="modal-box" style="width: 440px; text-align: center;">
+      <div style="margin-bottom: 16px;">
+        <img src="assets/logo.jpg" alt="Logo" style="width: 58px; height: 58px; border-radius: 12px; border: 2px solid #ff4500; object-fit: cover; margin-bottom: 8px;">
+        <h3 id="qr-modal-table-title" style="color: #fff; font-size: 18px; font-weight: 800; margin-bottom: 4px;">Stol #1 uchun QR Menyu</h3>
+        <p style="font-size: 12px; color: var(--accent-gold); font-weight: 600;">📱 Stol Usti Raqamli Buyurtma Kartasi</p>
+      </div>
+
+      <div style="background: #ffffff; padding: 18px; border-radius: 14px; display: inline-block; box-shadow: 0 8px 24px rgba(0,0,0,0.5); margin-bottom: 16px;">
+        <img id="qr-code-image" src="" alt="QR Code" style="width: 200px; height: 200px; display: block; border-radius: 6px;">
+      </div>
+
+      <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px;">
+        Mijoz o'z smartfoni kamerasini ushbu QR kodga qaratib, <strong>XON SHASHLIK</strong> to'liq menyusini ko'rishi va to'g'ridan-to'g'ri buyurtma berishi mumkin.
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeQrModal()">Yopish</button>
+        <button type="button" class="btn-primary" style="flex: 1;" onclick="window.print()">🖨 QR Kartani Chop Etish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Table Reservation (TastyIgniter / Satisfecho Integration) -->
+  <div class="modal-overlay" id="reservation-modal">
+    <div class="modal-box" style="width: 460px;">
+      <h3 style="margin-bottom: 16px;">📅 Stol va VIP Xonani Band Qilish (Bron)</h3>
+      <form id="reservation-form" onsubmit="saveReservation(event)">
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Mijoz Ismi:</label>
+          <input type="text" id="res-guest-name" required placeholder="Masalan: Sardor Rahimov" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 9px; color: #fff; border-radius: 6px;">
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Telefon Raqami:</label>
+          <input type="tel" id="res-guest-phone" required placeholder="+998 90 123 45 67" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 9px; color: #fff; border-radius: 6px;">
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+          <div style="flex: 1;">
+            <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Stol / VIP Xona:</label>
+            <select id="res-table-select" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 9px; color: #fff; border-radius: 6px; font-weight: 700;">
+              <!-- Dynamic Tables loaded via JS -->
+            </select>
+          </div>
+          <div style="width: 110px;">
+            <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Mehmonlar:</label>
+            <input type="number" id="res-guest-count" value="4" min="1" max="20" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 9px; color: #fff; border-radius: 6px; text-align: center;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label style="font-size: 12px; color: var(--accent-gold); display: block; margin-bottom: 4px;">Bron Vaqti (Sana va Soat):</label>
+          <input type="text" id="res-time-input" required placeholder="Masalan: Bugun 19:30" value="Bugun 19:30" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--accent-gold); padding: 9px; color: #fff; border-radius: 6px; font-weight: 700;">
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeReservationModal()">Bekor Qilish</button>
+          <button type="submit" class="btn-primary" style="flex: 1;">Stolni Band Qilish</button>
         </div>
       </form>
     </div>
