@@ -5,15 +5,15 @@ let currentView = 'dashboard';
 let cart = [];
 let activeCategory = 'Barchasi';
 
-// Sample Menu Data
+// Sample Menu Data with SVG/Emoji Icon fallbacks
 let menuData = [
-  { id: 1, name: "Toshkent Palovi (Osh)", category: "Milliy Taomlar", price: 42000, available: true, img: "assets/plov.jpg", salesCount: 142 },
-  { id: 2, name: "Qo'y Go'shtli Shashlik", category: "Kabablar", price: 28000, available: true, img: "assets/shashlik.jpg", salesCount: 198 },
-  { id: 3, name: "Uyg'ur Lag'moni", category: "Milliy Taomlar", price: 38000, available: true, img: "assets/plov.jpg", salesCount: 84 },
-  { id: 4, name: "Tandir Somsa (Go'shtli)", category: "Milliy Taomlar", price: 12000, available: true, img: "assets/shashlik.jpg", salesCount: 310 },
-  { id: 5, name: "Achichuk Salati", category: "Salatlar", price: 16000, available: true, img: "assets/plov.jpg", salesCount: 115 },
-  { id: 6, name: "Kola 1.5L / Qora Choy", category: "Ichimliklar", price: 14000, available: true, img: "assets/shashlik.jpg", salesCount: 240 },
-  { id: 7, name: "Mastava Sho'rba", category: "Sho'rbalar", price: 32000, available: true, img: "assets/plov.jpg", salesCount: 62 }
+  { id: 1, name: "Toshkent Palovi (Osh)", category: "Milliy Taomlar", price: 42000, available: true, icon: "🍲", color: "linear-gradient(135deg, #f59e0b, #d97706)", salesCount: 142 },
+  { id: 2, name: "Qo'y Go'shtli Shashlik", category: "Kabablar", price: 28000, available: true, icon: "🍢", color: "linear-gradient(135deg, #ef4444, #b91c1c)", salesCount: 198 },
+  { id: 3, name: "Uyg'ur Lag'moni", category: "Milliy Taomlar", price: 38000, available: true, icon: "🍜", color: "linear-gradient(135deg, #8b5cf6, #6d28d9)", salesCount: 84 },
+  { id: 4, name: "Tandir Somsa (Go'shtli)", category: "Milliy Taomlar", price: 12000, available: true, icon: "🥟", color: "linear-gradient(135deg, #f97316, #c2410c)", salesCount: 310 },
+  { id: 5, name: "Achichuk Salati", category: "Salatlar", price: 16000, available: true, icon: "🥗", color: "linear-gradient(135deg, #10b981, #047857)", salesCount: 115 },
+  { id: 6, name: "Kola 1.5L / Qora Choy", category: "Ichimliklar", price: 14000, available: true, icon: "🥤", color: "linear-gradient(135deg, #3b82f6, #1d4ed8)", salesCount: 240 },
+  { id: 7, name: "Mastava Sho'rba", category: "Sho'rbalar", price: 32000, available: true, icon: "🥣", color: "linear-gradient(135deg, #eab308, #a16207)", salesCount: 62 }
 ];
 
 // Sample Active Orders
@@ -114,7 +114,6 @@ function drawSalesChart(range) {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   
-  // Set dimensions
   const rect = canvas.parentElement.getBoundingClientRect();
   canvas.width = rect.width;
   canvas.height = 260;
@@ -184,13 +183,10 @@ function drawSalesChart(range) {
   ctx.stroke();
 
   // Draw Points & Labels
-  ctx.fillStyle = '#9ca3af';
-  ctx.font = '12px Plus Jakarta Sans';
   labels.forEach((label, i) => {
     const x = getX(i);
     const y = getY(points[i]);
 
-    // Point dot
     ctx.beginPath();
     ctx.arc(x, y, 5, 0, Math.PI * 2);
     ctx.fillStyle = '#f59e0b';
@@ -199,7 +195,6 @@ function drawSalesChart(range) {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // X Label
     ctx.fillStyle = '#9ca3af';
     ctx.fillText(label, x - 14, height - 15);
   });
@@ -220,7 +215,9 @@ function renderTopDishes() {
   
   container.innerHTML = sorted.map((dish, idx) => `
     <div class="dish-rank-item">
-      <img src="${dish.img}" class="dish-img" alt="${dish.name}">
+      <div style="width: 48px; height: 48px; border-radius: 8px; background: ${dish.color}; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+        ${dish.icon}
+      </div>
       <div class="dish-info">
         <h4>#${idx + 1} ${dish.name}</h4>
         <span>${dish.category}</span>
@@ -331,7 +328,9 @@ function renderPosMenu() {
 
   container.innerHTML = filtered.map(dish => `
     <div class="menu-card" onclick="addToCart(${dish.id})">
-      <img src="${dish.img}" class="menu-card-img" alt="${dish.name}">
+      <div style="height: 110px; width: 100%; background: ${dish.color}; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+        ${dish.icon}
+      </div>
       <div class="menu-card-body">
         <div class="menu-card-title">${dish.name}</div>
         <div class="menu-card-price">${dish.price.toLocaleString()} UZS</div>
@@ -437,7 +436,6 @@ function submitPosOrder() {
   renderKDSBoard();
   openReceiptModal(newOrder);
 
-  // Reset Cart
   cart = [];
   renderCart();
 }
@@ -492,7 +490,9 @@ function renderMenuManagement() {
   tbody.innerHTML = menuData.map(dish => `
     <tr style="border-bottom: 1px solid var(--border-color);">
       <td style="padding: 14px 20px; display: flex; align-items: center; gap: 12px;">
-        <img src="${dish.img}" style="width: 36px; height: 36px; border-radius: 6px; object-fit: cover;">
+        <div style="width: 36px; height: 36px; border-radius: 6px; background: ${dish.color}; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+          ${dish.icon}
+        </div>
         <strong>${dish.name}</strong>
       </td>
       <td style="padding: 14px 20px; color: var(--text-muted);">${dish.category}</td>
@@ -534,13 +534,22 @@ function saveNewDish(e) {
   const category = document.getElementById('dish-category').value;
   const price = parseFloat(document.getElementById('dish-price').value);
 
+  const icons = {
+    "Milliy Taomlar": "🍲",
+    "Kabablar": "🍢",
+    "Sho'rbalar": "🥣",
+    "Salatlar": "🥗",
+    "Ichimliklar": "🥤"
+  };
+
   const newDish = {
     id: menuData.length + 1,
     name: name,
     category: category,
     price: price,
     available: true,
-    img: "assets/plov.jpg",
+    icon: icons[category] || "🍽️",
+    color: "linear-gradient(135deg, #f59e0b, #d97706)",
     salesCount: 0
   };
 
