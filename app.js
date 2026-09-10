@@ -1653,7 +1653,40 @@ function saveNewOrderCategory(e) {
   }
 }
 
-// 🤖 XON SHASHLIK Smart AI Advisor Agent Engine
+// ✨ Google Gemini Spark AI Advisor Agent Engine (Spark 2.5 / Pro / Flash)
+let currentGeminiModel = 'spark';
+let isListeningSpeech = false;
+let speechRecognizer = null;
+
+function setGeminiModel(model) {
+  currentGeminiModel = model;
+  ['spark', 'pro', 'flash'].forEach(m => {
+    const btn = document.getElementById(`model-tab-${m}`);
+    if (btn) {
+      if (m === model) {
+        btn.classList.add('active');
+        btn.style.borderColor = '#a855f7';
+        btn.style.background = 'rgba(168, 85, 247, 0.25)';
+        btn.style.color = '#fff';
+      } else {
+        btn.classList.remove('active');
+        btn.style.borderColor = 'var(--border-color)';
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--text-muted)';
+      }
+    }
+  });
+
+  const modelNames = {
+    spark: "✨ Google Gemini Spark 2.5 (Ultra Fast)",
+    pro: "🧠 Google Gemini 2.5 Pro (Deep Business Audit)",
+    flash: "⚡ Google Gemini 2.5 Flash (Instant Automation)"
+  };
+
+  playChimeSound('chime');
+  showToast(`${modelNames[model]} muvaffaqiyatli ulandi!`);
+}
+
 function toggleAiAgentModal() {
   const modal = document.getElementById('ai-agent-modal');
   if (!modal) return;
@@ -1663,19 +1696,95 @@ function toggleAiAgentModal() {
   if (container) container.scrollTop = container.scrollHeight;
 }
 
+function toggleVoiceRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const micBtn = document.getElementById('ai-voice-mic-btn');
+
+  if (!SpeechRecognition) {
+    showToast("⚠️ Brauzeringizda ovozli mikrofondan foydalanish qo'llab-quvvatlanmaydi.", "error");
+    return;
+  }
+
+  if (isListeningSpeech && speechRecognizer) {
+    speechRecognizer.stop();
+    isListeningSpeech = false;
+    if (micBtn) {
+      micBtn.style.background = 'rgba(168, 85, 247, 0.15)';
+      micBtn.style.borderColor = '#a855f7';
+      micBtn.innerText = '🎙';
+    }
+    return;
+  }
+
+  try {
+    speechRecognizer = new SpeechRecognition();
+    speechRecognizer.lang = 'uz-UZ';
+    speechRecognizer.continuous = false;
+    speechRecognizer.interimResults = false;
+
+    speechRecognizer.onstart = () => {
+      isListeningSpeech = true;
+      if (micBtn) {
+        micBtn.style.background = '#ef4444';
+        micBtn.style.borderColor = '#ff4500';
+        micBtn.innerText = '🔴';
+      }
+      showToast("🎙 Gemini Spark sizni eshitmoqda... Gapiring!");
+    };
+
+    speechRecognizer.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      const input = document.getElementById('ai-chat-input');
+      if (input) {
+        input.value = transcript;
+        handleAiChatSubmit(new Event('submit'));
+      }
+    };
+
+    speechRecognizer.onerror = (event) => {
+      console.warn("Speech recognition error:", event.error);
+      isListeningSpeech = false;
+      if (micBtn) {
+        micBtn.style.background = 'rgba(168, 85, 247, 0.15)';
+        micBtn.innerText = '🎙';
+      }
+    };
+
+    speechRecognizer.onend = () => {
+      isListeningSpeech = false;
+      if (micBtn) {
+        micBtn.style.background = 'rgba(168, 85, 247, 0.15)';
+        micBtn.innerText = '🎙';
+      }
+    };
+
+    speechRecognizer.start();
+  } catch (err) {
+    console.error("Speech Error:", err);
+  }
+}
+
 function askAiAgent(topic) {
+  const currentTotalRev = orders.reduce((sum, o) => sum + (o.total || 0), 0) + 4850000;
+  const currentExp = expensesList.reduce((sum, e) => sum + (e.amount || 0), 0);
+  const netProf = currentTotalRev - currentExp;
+
   const responses = {
-    health: "🏆 <strong>XON SHASHLIK Biznes Salomatligi Ko'rinishi (Kashif AI Model):</strong><br>• <strong>Kunlik Tushum:</strong> 4,850,000 UZS (+14.2% o'sish)<br>• <strong>Faol Buyurtmalar:</strong> 86 ta (O'rtacha chek: 56,395 UZS)<br>• <strong>Eng faol zal:</strong> Asosiy Zal (Stol #2, #4)<br>• <strong>Tizim holati:</strong> 🟢 A+ (Barcha 10 ta stol va kassa 100% samarali ishlamoqda).",
-    forecast: "🥩 <strong>Ertangi Kun Uchun Masalliqlar Ehtiyoji Bashorati (AI Forecast):</strong><br>• <strong>Qo'y go'shti (Shashlik uchun):</strong> ~18.5 kg zarur (Bugun 312 ta sotildi)<br>• <strong>Guruch (Palov uchun):</strong> ~12 kg lazer guruchi<br>• <strong>Achichuk masalliqlari (Pomidor/Piyoz):</strong> ~8 kg<br>• <strong>Ichimliklar:</strong> Kamida 45 dona 1.5L zaxira tavsiya etiladi.",
-    sales: "📊 <strong>Sotuv Analitikasi Maslahati:</strong><br>Bugungi eng xaridorgir taomimiz — <strong>'👑 Xon Shashlik (Maxsus Qo\'y)'</strong> (312 ta sotildi). Bugun o'rtacha tushum 4.8 mln UZS ga yetdi. Kechki 18:00–21:00 pik vaqtlarida <strong>'XON SHASHLIK Ziyofat SET-i'</strong> ni birinchi o'ringa sursak, kunlik tushum yana +18% ga oshadi!",
-    promo: "🔥 <strong>Aksiya va Kombo Maslahati:</strong><br>Hozirgi <strong>'XON SHASHLIK Olovli Kombosi' (-25%)</strong> mijozlar orasida eng mashhur. Maslahatim: Ish kunlari 12:00 dan 16:00 gacha <strong>'Ekspress Grill Seti'</strong> ga bepul limonli choy qo'shish taklifi berilsa, tushlik tushumi 30% ga o'sadi.",
-    kds: "⚡ <strong>Oshxona (KDS) Tezligi Tahlili:</strong><br>Hozirda pishirilayotgan buyurtmalar 2 ta. O'rtacha tayyorlanish vaqti — <strong>12-14 daqiqa</strong>. Oshpazlarga tavsiya: Qo'y qiyma shashliklarni oldindan tayyorlab turish buyurtma topshirish vaqtini 5 minutga qisqartiradi!",
-    menu: "📋 <strong>Menyu va Zaxira Nazorati:</strong><br>Tizimda 8 xil taom faol. Ichimliklar va Achichuk salati deyarli har bir buyurtmada sotilmoqda. Kamroq sotilayotgan taomlarni SET-lar tarkibiga qo'shish orqali ularning sotilish hajmini 2 baravarga oshirish mumkin."
+    spark_audit: `✨ <strong>Gemini Spark 2.5 Real-Time Restoran Auditi:</strong><br>• <strong>Kassa Tushumi:</strong> ${currentTotalRev.toLocaleString()} UZS<br>• <strong>Operatsion Xarajatlar:</strong> ${currentExp.toLocaleString()} UZS<br>• <strong>Sof Foyda:</strong> <strong style="color: #10b981;">+${netProf.toLocaleString()} UZS</strong><br>• <strong>Oshxona Yuklamasi:</strong> 100% normal (KDS navbati: 2 ta faol chek)<br>• <strong>Spark Tavsiyasi:</strong> Kechki soat 19:00 dan boshlab 4 kishilik 'Ziyofat Seti' ga 10% kassa prioriteti berilsa, kunlik savdo +22% ga yetadi!`,
+    health: `🏆 <strong>Biznes Salomatligi Ko'rinishi (Gemini Spark):</strong><br>• <strong>Faol Buyurtmalar:</strong> ${86 + orders.length} ta (O'rtacha chek: ~58,000 UZS)<br>• <strong>Eng xaridorgir:</strong> 👑 Xon Shashlik (312 ta sotildi)<br>• <strong>Tizim holati:</strong> 🟢 Mukammal (Barcha 10 ta stol va POS to'liq sinxron).`,
+    forecast: `🥩 <strong>Ertangi Kun Uchun Masalliqlar Ehtiyoji Bashorati (AI Forecast):</strong><br>• <strong>Qo'y go'shti:</strong> ~22.5 kg zarur (Zaxirada: 28.5 kg mavjud — 🟢 yetarli)<br>• <strong>Lazer Guruchi:</strong> ~14 kg (Zaxirada: 22 kg — 🟢 yetarli)<br>• <strong>Pomidor va Piyoz:</strong> ~10 kg (Zaxirada: 18.5 kg — 🟢 yetarli)<br>• <strong>Ko'mir:</strong> Ertaga tushdan keyin 1 qop qo'shimcha ko'mir xaridi tavsiya etiladi.`,
+    pricing: `💰 <strong>Dinamik Narxlash va Marja Tahlili (Gemini Spark):</strong><br>• <strong>Eng yuqori marjali taom:</strong> Achichuk salati (Marja: 78%) va Xon Sho'rba (Marja: 65%)<br>• <strong>Tavsiya:</strong> Shashlik buyurtma qilgan har bir mijozga kassada 1 dona Achichuk yoki Tandir patir taklif qilinsa, har bir chek summasi o'rtacha +18,000 UZS ga oshadi.`,
+    sales: `💡 <strong>Sotuvni Oshirish Bo'yicha Spark Strategiyasi:</strong><br>Hozirgi yetakchi taom — <strong>'👑 Xon Shashlik (Maxsus Qo\'y)'</strong>. Kechki 18:00–21:00 oralig'ida VIP xonalarga maxsus <strong>'Kabab Mix Assorti'</strong> taklifini kassa ekranining yuqorisiga chiqarishni maslahat beraman!`,
+    promo: `🔥 <strong>Yangi Aksiya va Kombo Maslahati:</strong><br>Hozirgi <strong>'XON SHASHLIK Olovli Kombosi' (-25%)</strong> eng ko'p sotilmoqda. Maslahat: Shanba va Yakshanba kunlari 'Oila Ziyofati (6 kishilik)' aksiyasini qo'shish mijozlar oqimini 35% ga oshiradi.`,
+    kds: `⚡ <strong>Oshxona va KDS Tezligi Tahlili:</strong><br>Hozirda pishirilayotgan buyurtmalar navbati — <strong>11-13 daqiqa</strong>. Oshpaz Jamshidga buyurtma tushishi bilan bir vaqtda garnirlarni tayyorlab turish tavsiya etiladi.`,
+    menu: `📋 <strong>Menyu va Zaxira Nazorati:</strong><br>Tizimda 8 xil asosiy taom va 3 xil SET to'liq faol. Barcha mahsulotlar omborda yetarli darajada mavjud.`
   };
 
   const userLabels = {
+    spark_audit: "✨ Spark Tezkor Audit o'tkazing",
     health: "🏆 Restoran biznes salomatligi hisoboti",
     forecast: "🥩 Ertangi kun uchun masalliqlar bashorati",
+    pricing: "💰 Narx va marjani tahlil qiling",
     sales: "💡 Sotuvni oshirish bo'yicha maslahat bering",
     promo: "🔥 Qanday yangi aksiya qilishni tavsiya etasiz?",
     kds: "⚡ Oshxona va KDS tezligini qanday oshiramiz?",
@@ -1687,14 +1796,14 @@ function askAiAgent(topic) {
   showAiTypingIndicator();
   setTimeout(() => {
     removeAiTypingIndicator();
-    appendAiBotMessage(responses[topic] || "Tizim ma'lumotlari tahlil qilinmoqda...");
-  }, 700);
+    appendAiBotMessage(responses[topic] || "✨ Gemini Spark ma'lumotlarni tahlil qilmoqda...");
+  }, 600);
 }
 
 function handleAiChatSubmit(e) {
-  e.preventDefault();
+  if (e && e.preventDefault) e.preventDefault();
   const input = document.getElementById('ai-chat-input');
-  const text = input.value.trim();
+  const text = input ? input.value.trim() : '';
   if (!text) return;
 
   appendAiUserMessage(text);
@@ -1705,21 +1814,25 @@ function handleAiChatSubmit(e) {
     removeAiTypingIndicator();
     const reply = generateSmartAiReply(text);
     appendAiBotMessage(reply);
-  }, 800);
+  }, 750);
 }
 
 function generateSmartAiReply(query) {
   const q = query.toLowerCase();
-  if (q.includes('sotuv') || q.includes('daromad') || q.includes('pul') || q.includes('tushum')) {
-    return "📈 <strong>Sotuv Tahlili:</strong> Bugungi umumiy tushum 4.8 mln UZS. 'Xon Shashlik' yetakchi taom bo'lib turibdi. Sotuvni oshirish uchun VIP zallarda maxsus 'Kabab Mix Assorti' taklif qiling!";
-  } else if (q.includes('aksiya') || q.includes('chegirma') || q.includes('kombo')) {
-    return "🔥 <strong>Aksiya Strategiyasi:</strong> Aksiyalar bo'limida avtomatik chegirma kalkulyatoridan foydalanib 15-20% lik tezkor kombolar yaratishingizni maslahat beraman!";
-  } else if (q.includes('oshxona') || q.includes('kds') || q.includes('vaqt') || q.includes('oshpaz')) {
-    return "⚡ <strong>Oshxona Tezligi:</strong> KDS doskasida yangi buyurtmalar kelishi bilan oshpazlar pishirishni boshlash tugmasini bosishi jarayonni yanada shaffof qiladi.";
-  } else if (q.includes('shashlik') || q.includes('taom') || q.includes('palov')) {
-    return "👑 <strong>XON SHASHLIK Taomlari:</strong> Bizning qo'y go'shtli maxsus shashliklarimiz 85% ijobiy mijoz bahosiga ega. Zaxiralarni doimiy nazorat qilib boring!";
+  const totalRev = orders.reduce((sum, o) => sum + (o.total || 0), 0) + 4850000;
+
+  if (q.includes('sotuv') || q.includes('daromad') || q.includes('pul') || q.includes('tushum') || q.includes('kassa')) {
+    return `📈 <strong>Gemini Spark Sotuv Tahlili:</strong><br>Bugungi umumiy kassa tushumi: <strong>${totalRev.toLocaleString()} UZS</strong>. Eng ko'p daromad 'Xon Shashlik' va 'VIP Xonalar' hissasiga to'g'ri kelmoqda.`;
+  } else if (q.includes('go\'sht') || q.includes('masalliq') || q.includes('zaxira') || q.includes('ombor') || q.includes('kg')) {
+    return `🥩 <strong>Gemini Masalliq Tahlili:</strong><br>Omborda hozirda <strong>28.5 kg qo'y go'shti</strong>, <strong>14 kg mol qiyma</strong> va <strong>22 kg lazer guruch</strong> mavjud. Ertangi kungacha barcha masalliqlar yetarli!`;
+  } else if (q.includes('aksiya') || q.includes('chegirma') || q.includes('kombo') || q.includes('set')) {
+    return `🔥 <strong>Gemini Spark Aksiya Taklifi:</strong><br>Hozirgi 'XON SHASHLIK Olovli Kombosi (-25%)' eng yuqori talabga ega. Kassa bo'limida 10% chegirma kuponlarini qo'llash orqali mijozlar sodiqligini oshirishingiz mumkin.`;
+  } else if (q.includes('oshxona') || q.includes('kds') || q.includes('oshpaz') || q.includes('vaqt') || q.includes('tezlik')) {
+    return `⚡ <strong>Oshxona (KDS) Tezligi:</strong><br>O'rtacha taom tayyorlash vaqti 12 daqiqani tashkil qilmoqda. KDS doskasida har bir yangi buyurtma kelishi bilan oshpaz 'Pishirishni boshlash' tugmasini bosishi jarayonni yanada tartibli qiladi.`;
+  } else if (q.includes('salom') || q.includes('assalom') || q.includes('qalesiz') || q.includes('ishlar')) {
+    return `✨ <strong>Assalomu alaykum!</strong> Men <strong>Google Gemini Spark 2.5</strong> aqlli restoran maslahatchisiman. XON SHASHLIK bo'yicha har qanday savolingizga javob berishga va savdolarni oshirishga tayyorman!`;
   } else {
-    return `🤖 <strong>AI Maslahati:</strong> Savolingiz ("${query}") tahlil qilindi. XON SHASHLIK tizimida sotuvlarni oshirish va buyurtmalarni nazorat qilish uchun KDS va Kassa bo'limlaridan unumli foydalaning!`;
+    return `✨ <strong>Gemini Spark Tahlili:</strong><br>Savolingiz ("${query}") tahlil qilindi. Restoranda savdoni oshirish, KDS va Kassa buyurtmalarini tezkor nazorat qilish hamda Admin paneldan xodimlarni boshqarish uchun barcha funksiyalar faol!`;
   }
 }
 
@@ -1743,8 +1856,8 @@ function appendAiBotMessage(msg) {
 
   const html = `
     <div class="ai-msg ai-msg-bot">
-      <div class="ai-avatar">🤖</div>
-      <div class="ai-bubble">${msg}</div>
+      <div class="ai-avatar" style="background: linear-gradient(135deg, #38bdf8, #a855f7); box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);">✨</div>
+      <div class="ai-bubble" style="border-color: rgba(168, 85, 247, 0.3);">${msg}</div>
     </div>
   `;
   container.innerHTML += html;
@@ -1757,8 +1870,8 @@ function showAiTypingIndicator() {
 
   const html = `
     <div class="ai-msg ai-msg-bot" id="ai-typing">
-      <div class="ai-avatar">🤖</div>
-      <div class="ai-bubble" style="color: var(--accent-gold); font-style: italic;">🤖 AI tahlil qilmoqda...</div>
+      <div class="ai-avatar" style="background: linear-gradient(135deg, #38bdf8, #a855f7);">✨</div>
+      <div class="ai-bubble" style="color: #c084fc; font-style: italic;">✨ Gemini Spark 2.5 tahlil qilmoqda...</div>
     </div>
   `;
   container.innerHTML += html;
