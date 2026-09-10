@@ -371,6 +371,16 @@ function renderKDSBoard() {
     return activeKdsOrderCategory === 'Barchasi' || order.category === activeKdsOrderCategory;
   });
 
+  if (filteredOrders.length === 0) {
+    cols.new.innerHTML = `
+      <div style="color: var(--text-muted); text-align: center; padding: 24px 12px; font-size: 13px; background: var(--bg-card); border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
+        <div style="font-size: 20px; margin-bottom: 6px;">📋</div>
+        <span>"${activeKdsOrderCategory}" bo'yicha hozircha buyurtma yo'q.</span><br><br>
+        <button class="btn-primary" style="font-size: 12px; padding: 6px 14px; margin: 0 auto;" onclick="openNewOrderModal()">+ Buyurtma Qabul Qilish</button>
+      </div>
+    `;
+  }
+
   filteredOrders.forEach(order => {
     counts[order.status]++;
     const cardHtml = `
@@ -933,20 +943,32 @@ function closeAddCategoryModal() {
 }
 
 function saveNewCategory(e) {
-  e.preventDefault();
-  const name = document.getElementById('new-category-name').value.trim();
-  const img = document.getElementById('new-category-img').value.trim() || presetFoodPhotos[0].url;
+  if (e && e.preventDefault) e.preventDefault();
+  const nameInput = document.getElementById('new-category-name');
+  const name = nameInput ? nameInput.value.trim() : '';
+  const imgInput = document.getElementById('new-category-img');
+  const img = (imgInput && imgInput.value.trim()) || presetFoodPhotos[0].url;
 
-  if (name && !categoriesList.some(c => c.name === name)) {
+  if (!name) {
+    showToast("Iltimos, taom kategoriyasi nomini kiriting!", "error");
+    return;
+  }
+
+  if (!categoriesList.some(c => c.name.toLowerCase() === name.toLowerCase())) {
     categoriesList.push({ name: name, img: img });
     activeCategory = name;
     renderPosCategories();
     populateDishCategoryDropdown();
     renderPosMenu();
+    showToast(`✅ "${name}" taom kategoriyasi muvaffaqiyatli saqlandi!`);
+  } else {
+    showToast(`ℹ️ "${name}" taom kategoriyasi allaqachon mavjud.`, "info");
   }
 
   closeAddCategoryModal();
-  document.getElementById('add-category-form').reset();
+  if (document.getElementById('add-category-form')) {
+    document.getElementById('add-category-form').reset();
+  }
 }
 
 function saveNewDish(e) {
@@ -1065,21 +1087,48 @@ function closeAddOrderCategoryModal() {
   document.getElementById('add-order-category-modal').classList.remove('active');
 }
 
+function showToast(message, type = 'success') {
+  let toastContainer = document.getElementById('toast-notification-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.id = 'toast-notification-container';
+    toastContainer.style.cssText = 'position:fixed; top:24px; right:24px; z-index:999999; display:flex; flex-direction:column; gap:10px; pointer-events:none;';
+    document.body.appendChild(toastContainer);
+  }
+
+  const toast = document.createElement('div');
+  const borderCol = type === 'error' ? '#ef4444' : (type === 'info' ? '#3b82f6' : '#10b981');
+  toast.style.cssText = `background:#140d0a; color:#ffffff; border:1px solid ${borderCol}; border-left:5px solid ${borderCol}; padding:14px 20px; border-radius:8px; font-size:14px; font-weight:700; box-shadow:0 10px 30px rgba(0,0,0,0.6), 0 0 15px rgba(255,69,0,0.2); display:flex; align-items:center; gap:10px; pointer-events:auto; min-width:280px; max-width:400px;`;
+  toast.innerHTML = message;
+  toastContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.transition = 'all 0.4s ease';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(-15px)';
+    setTimeout(() => toast.remove(), 400);
+  }, 3200);
+}
+
 function saveNewOrderCategory(e) {
-  e.preventDefault();
+  if (e && e.preventDefault) e.preventDefault();
   const nameInput = document.getElementById('new-order-cat-name');
   const placeholderInput = document.getElementById('new-order-cat-placeholder');
   const name = nameInput ? nameInput.value.trim() : '';
   const placeholder = placeholderInput ? placeholderInput.value.trim() : '';
 
-  if (name && !orderCategoriesList.some(c => c.name === name)) {
+  if (!name) {
+    showToast("Iltimos, kategoriya nomini kiriting!", "error");
+    return;
+  }
+
+  if (!orderCategoriesList.some(c => c.name.toLowerCase() === name.toLowerCase())) {
     orderCategoriesList.push({
       id: `cat_${Date.now()}`,
       name: name,
       placeholder: placeholder || 'Tafsilot...'
     });
 
-    activeKdsOrderCategory = name;
     renderKdsCategoryFilterPills();
     renderPosOrderCategoriesDropdown();
 
@@ -1089,6 +1138,9 @@ function saveNewOrderCategory(e) {
       onOrderCategoryChange();
     }
     renderKDSBoard();
+    showToast(`✅ "${name}" buyurtma kategoriyasi muvaffaqiyatli saqlandi!`);
+  } else {
+    showToast(`ℹ️ "${name}" kategoriyasi allaqachon mavjud.`, "info");
   }
 
   closeAddOrderCategoryModal();
