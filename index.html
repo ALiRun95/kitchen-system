@@ -63,6 +63,10 @@
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
           <span>Taomlar Menyu Nazorati</span>
         </div>
+        <div class="nav-item" id="nav-admin" onclick="switchView('admin')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          <span>⚙️ Admin Panel</span>
+        </div>
       </nav>
 
       <div class="sidebar-footer" style="padding-top: 14px; border-top: 1px solid var(--border-color);">
@@ -107,6 +111,12 @@
           </button>
           
           <div class="live-clock" id="live-clock" style="font-size: 13px; font-weight: 700;">--:--:--</div>
+
+          <!-- Phone Auth / Profile Button -->
+          <div id="header-auth-status">
+            <!-- Rendered via JS -->
+          </div>
+
           <button class="btn-primary" onclick="openNewOrderModal()" style="padding: 6px 12px; font-size: 12px;">
             <span>+ Yangi Buyurtma</span>
           </button>
@@ -468,6 +478,178 @@
         </div>
       </section>
 
+      <!-- View 5: Comprehensive Restaurant Admin Panel -->
+      <section class="view-section" id="view-admin">
+        <!-- Admin Profile & Subtab Header -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 18px 24px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #ff4500, #ffb703); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 16px rgba(255, 69, 0, 0.4);">👑</div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <h3 style="font-size: 18px; font-weight: 900; color: #fff; margin: 0;" id="admin-user-display-name">Boshqaruvchi Admin</h3>
+                <span style="background: rgba(255, 183, 3, 0.15); color: var(--accent-gold); border: 1px solid var(--accent-gold); font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px;">👑 Bosh Admin</span>
+              </div>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;" id="admin-user-phone-display">Tel: +998 90 123 45 67 • To'liq Huquq</p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn-secondary" style="font-size: 12px; padding: 6px 14px; border-color: #ef4444; color: #ef4444;" onclick="logoutAdmin()">🚪 Chiqish</button>
+          </div>
+        </div>
+
+        <!-- Admin Subtabs Navigation -->
+        <div class="filter-pills" style="margin-bottom: 20px; display: flex; gap: 8px; flex-wrap: wrap;" id="admin-subtabs-nav">
+          <button class="pill active" id="admin-subtab-btn-staff" onclick="switchAdminSubtab('staff')" style="border: 1px solid var(--accent-amber); font-size: 13px; padding: 6px 14px;">👥 Xodimlar & Rollar</button>
+          <button class="pill" id="admin-subtab-btn-finance" onclick="switchAdminSubtab('finance')" style="border: 1px solid var(--border-color); font-size: 13px; padding: 6px 14px;">💰 Moliyaviy Xulosa & Chiqimlar</button>
+          <button class="pill" id="admin-subtab-btn-inventory" onclick="switchAdminSubtab('inventory')" style="border: 1px solid var(--border-color); font-size: 13px; padding: 6px 14px;">🥩 Masalliqlar & Ombor</button>
+          <button class="pill" id="admin-subtab-btn-settings" onclick="switchAdminSubtab('settings')" style="border: 1px solid var(--border-color); font-size: 13px; padding: 6px 14px;">⚙️ Tizim Sozlamalari</button>
+        </div>
+
+        <!-- Admin Subtab 1: Staff & Roles -->
+        <div class="admin-subtab-content" id="admin-subtab-staff">
+          <div class="card-title-bar" style="margin-bottom: 16px;">
+            <div>
+              <h3>👥 Restoran Xodimlari va Rollar</h3>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Kassirlar, oshpazlar va offitsiantlar hisobi</p>
+            </div>
+            <button class="btn-primary" onclick="openAddEmployeeModal()">+ Yangi Xodim Qo'shish</button>
+          </div>
+
+          <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+              <thead>
+                <tr style="background: var(--bg-sidebar); border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+                  <th style="padding: 12px 18px;">Xodim Ismi</th>
+                  <th style="padding: 12px 18px;">Lavozim / Rol</th>
+                  <th style="padding: 12px 18px;">Telefon</th>
+                  <th style="padding: 12px 18px;">Oylik Maosh</th>
+                  <th style="padding: 12px 18px;">Smena</th>
+                  <th style="padding: 12px 18px; text-align: right;">Boshqaruv</th>
+                </tr>
+              </thead>
+              <tbody id="admin-staff-tbody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Admin Subtab 2: Finance & Expenses -->
+        <div class="admin-subtab-content" id="admin-subtab-finance" style="display: none;">
+          <div class="metrics-grid" style="margin-bottom: 20px;">
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-title">Jami Sotuv Tushumi</span>
+                <span class="metric-icon" style="color: #10b981;">📈</span>
+              </div>
+              <div class="metric-value" style="color: #10b981;" id="admin-finance-revenue">4,850,000 UZS</div>
+              <div class="metric-subtext">Bugungi barcha kassa buyurtmalari</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-title">Jami Chiqimlar (Xarajat)</span>
+                <span class="metric-icon" style="color: #ef4444;">💸</span>
+              </div>
+              <div class="metric-value" style="color: #ef4444;" id="admin-finance-expenses">1,920,000 UZS</div>
+              <div class="metric-subtext">Go'sht, sabzavot va ko'mir xaridiga</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span class="metric-title">Kunlik Sof Foyda</span>
+                <span class="metric-icon" style="color: var(--accent-gold);">🏆</span>
+              </div>
+              <div class="metric-value" style="color: var(--accent-gold);" id="admin-finance-profit">2,930,000 UZS</div>
+              <div class="metric-subtext" style="color: #10b981;">Rentabellik: +60.4%</div>
+            </div>
+          </div>
+
+          <div class="card-title-bar" style="margin-bottom: 16px;">
+            <div>
+              <h3>💸 Kunlik Xarajatlar Jurnali (Chiqimlar)</h3>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Restoran operatsion chiqimlari va go'sht/masalliq haridi</p>
+            </div>
+            <button class="btn-primary" onclick="openAddExpenseModal()">+ Yangi Chiqim Kiritish</button>
+          </div>
+
+          <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+              <thead>
+                <tr style="background: var(--bg-sidebar); border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+                  <th style="padding: 12px 18px;">Vaqt</th>
+                  <th style="padding: 12px 18px;">Xarajat Turi</th>
+                  <th style="padding: 12px 18px;">Mas'ul Xodim</th>
+                  <th style="padding: 12px 18px;">Izoh / Maqsad</th>
+                  <th style="padding: 12px 18px; text-align: right;">Summa (UZS)</th>
+                </tr>
+              </thead>
+              <tbody id="admin-expenses-tbody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Admin Subtab 3: Inventory -->
+        <div class="admin-subtab-content" id="admin-subtab-inventory" style="display: none;">
+          <div class="card-title-bar" style="margin-bottom: 16px;">
+            <div>
+              <h3>🥩 Masalliqlar va Ombor Zaxirasi</h3>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Oshxona mahsulotlarining joriy qoldig'i</p>
+            </div>
+            <button class="btn-secondary" onclick="exportDailySalesReportCSV()">📥 Hisobotni Excelga Yuklash</button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;" id="admin-inventory-grid">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Admin Subtab 4: Settings -->
+        <div class="admin-subtab-content" id="admin-subtab-settings" style="display: none;">
+          <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; max-width: 720px;">
+            <h3 style="margin-bottom: 18px; font-size: 17px;">⚙️ XON SHASHLIK Tizim va Kassa Sozlamalari</h3>
+            
+            <form onsubmit="saveSystemSettings(event)">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                  <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Restoran Nomi:</label>
+                  <input type="text" id="setting-rest-name" value="XON SHASHLIK" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px; font-weight: 700;">
+                </div>
+                <div>
+                  <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Telefon Raqami:</label>
+                  <input type="tel" id="setting-rest-phone" value="+998 90 123 45 67" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                  <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Kassa Xizmat Haqi (%):</label>
+                  <input type="number" id="setting-service-pct" value="10" min="0" max="30" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px; font-weight: 700;">
+                </div>
+                <div>
+                  <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Wi-Fi Nomi & Paroli:</label>
+                  <input type="text" id="setting-wifi-info" value="XonShashlik_VIP (parol: shashlik2026)" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+                </div>
+              </div>
+
+              <div style="margin-bottom: 20px;">
+                <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Chek Printer Turi va Qog'oz O'lchami:</label>
+                <select id="setting-printer-type" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px; font-weight: 700;">
+                  <option value="80mm">80mm Thermal Kassa Printeri (Standart)</option>
+                  <option value="58mm">58mm Mini Mobil Chek Printeri</option>
+                  <option value="A4">A4 / PDF Universal Printer</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn-primary" style="padding: 10px 24px; font-size: 13px;">💾 Barcha Sozlamalarni Saqlash</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -765,7 +947,142 @@
       <span class="mobile-nav-icon">📋</span>
       <span>Menyu</span>
     </div>
+    <div class="mobile-nav-item" id="mobile-nav-admin" onclick="switchView('admin')">
+      <span class="mobile-nav-icon">⚙️</span>
+      <span>Admin</span>
+    </div>
   </nav>
+
+  <!-- Modal: Phone Authentication & Login (Faqat Telefon Raqami Orqali) -->
+  <div class="modal-overlay" id="phone-auth-modal">
+    <div class="modal-box" style="width: 440px; text-align: center;">
+      <div style="margin-bottom: 20px;">
+        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #ff4500, #ffb703); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 0 20px rgba(255,69,0,0.5); margin-bottom: 12px;">📱</div>
+        <h3 style="font-size: 19px; font-weight: 900; color: #fff; margin-bottom: 4px;">Admin Tizimiga Kirish</h3>
+        <p style="font-size: 12px; color: var(--text-muted);">XON SHASHLIK boshqaruv paneliga faqat telefon raqami orqali kiriladi</p>
+      </div>
+
+      <!-- Step 1: Input Phone Number -->
+      <div id="auth-step-phone">
+        <form id="auth-phone-form" onsubmit="handleSendSmsCode(event)">
+          <div style="margin-bottom: 16px; text-align: left;">
+            <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight: 700;">Telefon Raqamingiz:</label>
+            <div style="position: relative;">
+              <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--accent-gold); font-size: 14px;">🇺🇿</span>
+              <input type="tel" id="auth-phone-number" required placeholder="+998 90 123 45 67" value="+998 90 123 45 67" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 12px 14px 12px 42px; color: #fff; border-radius: 8px; font-weight: 800; font-size: 15px; letter-spacing: 0.5px;">
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn-secondary" style="flex: 1;" onclick="closePhoneAuthModal()">Bekor Qilish</button>
+            <button type="submit" class="btn-primary" style="flex: 1.5;">📲 SMS Kod Olish</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Step 2: Input SMS Verification Code -->
+      <div id="auth-step-sms" style="display: none;">
+        <form id="auth-sms-form" onsubmit="handleVerifySmsCode(event)">
+          <div style="background: rgba(255, 69, 0, 0.1); border: 1px solid rgba(255, 69, 0, 0.3); border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 12px; color: var(--text-muted);">
+            <span>Tasdiqlash kodi quyidagi raqamga yuborildi:</span><br>
+            <strong style="color: var(--accent-gold); font-size: 13px;" id="auth-target-phone-display">+998 90 123 45 67</strong>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="font-size: 12px; color: var(--accent-gold); display: block; margin-bottom: 6px; font-weight: 700;">4 xonali SMS Kodni Kiriting:</label>
+            <input type="text" id="auth-sms-code-input" required maxlength="4" placeholder="7777" value="7777" style="width: 160px; text-align: center; background: var(--bg-sidebar); border: 2px solid var(--accent-gold); padding: 10px; color: #fff; border-radius: 8px; font-weight: 900; font-size: 22px; letter-spacing: 6px; margin: 0 auto; display: block;">
+            <div style="font-size: 11px; color: #10b981; margin-top: 6px; font-weight: 700;">💡 Demo tasdiqlash kodi: 7777</div>
+          </div>
+
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn-secondary" style="flex: 1;" onclick="backToPhoneStep()">← Raqamni O'zgartirish</button>
+            <button type="submit" class="btn-primary" style="flex: 1.5;">✅ Kirish</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add New Employee (Xodim Qo'shish) -->
+  <div class="modal-overlay" id="add-employee-modal">
+    <div class="modal-box" style="width: 460px;">
+      <h3 style="margin-bottom: 16px;">👥 Yangi Xodim Qo'shish</h3>
+      <form id="add-employee-form" onsubmit="saveNewEmployee(event)">
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Xodim Ismi va Familiyasi:</label>
+          <input type="text" id="emp-name" required placeholder="Masalan: Jamshid Oshpaz" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 9px; color: #fff; border-radius: 6px;">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+          <div>
+            <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Lavozim (Rol):</label>
+            <select id="emp-role" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 9px; color: #fff; border-radius: 6px; font-weight: 700;">
+              <option value="👑 Administrator">👑 Administrator</option>
+              <option value="🍳 Bosh Oshpaz">🍳 Bosh Oshpaz</option>
+              <option value="💳 Kassir">💳 Kassir</option>
+              <option value="🍽 Offitsiant">🍽 Offitsiant</option>
+              <option value="🛵 Kuryer">🛵 Kuryer</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Telefon:</label>
+            <input type="tel" id="emp-phone" required placeholder="+998 90 ..." style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 9px; color: #fff; border-radius: 6px;">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+          <div>
+            <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Oylik Maosh (UZS):</label>
+            <input type="number" id="emp-salary" required placeholder="5000000" value="4500000" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 9px; color: #fff; border-radius: 6px;">
+          </div>
+          <div>
+            <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Ish Smenasi:</label>
+            <input type="text" id="emp-shift" value="Kunduzgi (09:00 - 18:00)" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 9px; color: #fff; border-radius: 6px;">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeAddEmployeeModal()">Bekor Qilish</button>
+          <button type="submit" class="btn-primary" style="flex: 1;">Xodimni Saqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add New Expense (Chiqim Kiritish) -->
+  <div class="modal-overlay" id="add-expense-modal">
+    <div class="modal-box" style="width: 460px;">
+      <h3 style="margin-bottom: 16px;">💸 Yangi Chiqim / Xarajat Kiritish</h3>
+      <form id="add-expense-form" onsubmit="saveNewExpense(event)">
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Xarajat Turi:</label>
+          <select id="exp-category" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 9px; color: #fff; border-radius: 6px; font-weight: 700;">
+            <option value="🥩 Go'sht va Masalliq xaridi">🥩 Go'sht va Masalliq xaridi</option>
+            <option value="🥬 Sabzavotlar & Ziravorlar">🥬 Sabzavotlar & Ziravorlar</option>
+            <option value="🔥 Shashlik Ko'miri">🔥 Shashlik Ko'miri</option>
+            <option value="🥤 Ichimliklar zaxirasi">🥤 Ichimliklar zaxirasi</option>
+            <option value="⚡ Kommunal & Xo'jalik">⚡ Kommunal & Xo'jalik</option>
+            <option value="👥 Xodimlar ovqati / Bonus">👥 Xodimlar ovqati / Bonus</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Summa (UZS):</label>
+          <input type="number" id="exp-amount" required placeholder="350000" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 9px; color: #fff; border-radius: 6px; font-weight: 700; font-size: 15px;">
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Izoh / Maqsad:</label>
+          <input type="text" id="exp-note" required placeholder="Masalan: 5 kg yangi qo'y go'shti olindi" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 9px; color: #fff; border-radius: 6px;">
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeAddExpenseModal()">Bekor Qilish</button>
+          <button type="submit" class="btn-primary" style="flex: 1;">Chiqimni Saqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Floating AI Advisor Agent Trigger Button -->
   <div id="ai-agent-trigger" class="ai-agent-fab" onclick="toggleAiAgentModal()">
