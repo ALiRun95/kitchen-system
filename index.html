@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oshxona Tizimlashtirish va Sotuv Analitikasi (Kitchen Operations OS)</title>
+  <meta name="description" content="Oshxona va restoranlar uchun sotuvlar analitikasi, buyurtmalar boshqaruvi va kassa tizimi.">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">🍳</div>
+        <div class="brand-title">
+          <h2>OSHMASHIN</h2>
+          <span>Kitchen System</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          <span>Sotuv Statistikasi</span>
+        </div>
+        <div class="nav-item" id="nav-kds" onclick="switchView('kds')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+          <span>Oshxona Board (KDS)</span>
+        </div>
+        <div class="nav-item" id="nav-pos" onclick="switchView('pos')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+          <span>Kassa / Yangi Buyurtma</span>
+        </div>
+        <div class="nav-item" id="nav-menu" onclick="switchView('menu')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          <span>Taomlar Menyu Nazorati</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        Oshmashin OS v2.4 • Active
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-title">
+          <h1 id="page-title">Sotuvlar Statistikasi va Analitika</h1>
+        </div>
+        <div class="header-actions">
+          <div class="live-clock" id="live-clock">--:--:--</div>
+          <button class="btn-primary" onclick="openNewOrderModal()">
+            <span>+ Yangi Buyurtma</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- View 1: Dashboard & Sales Analytics -->
+      <section class="view-section active" id="view-dashboard">
+        <!-- Metric Cards -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>Kunlik Tushum</span>
+              <div class="metric-icon">💰</div>
+            </div>
+            <div class="metric-value" id="metric-revenue">4,850,000 UZS</div>
+            <div class="metric-change change-up">
+              ▲ +14.2% <span>kechagiga nisbatan</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>Bugungi Buyurtmalar</span>
+              <div class="metric-icon">📑</div>
+            </div>
+            <div class="metric-value" id="metric-orders-count">86 ta</div>
+            <div class="metric-change change-up">
+              ▲ +8 ta <span>yangi buyurtma</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>O'rtacha Chek Summasi</span>
+              <div class="metric-icon">📊</div>
+            </div>
+            <div class="metric-value" id="metric-avg-check">56,395 UZS</div>
+            <div class="metric-change change-up">
+              ▲ +3.4% <span>o'sish</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-header">
+              <span>Oshxona Ish Tezligi</span>
+              <div class="metric-icon">⚡</div>
+            </div>
+            <div class="metric-value">12.4 min</div>
+            <div class="metric-change change-up">
+              ▲ 2.1 min <span>tezroq tayyorlandi</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="card-title-bar">
+              <h3>Soatbay Sotuv Dinamikasi</h3>
+              <div class="filter-pills">
+                <button class="pill active" onclick="updateChartRange('today')">Bugun</button>
+                <button class="pill" onclick="updateChartRange('week')">Shu Hafta</button>
+                <button class="pill" onclick="updateChartRange('month')">Shu Oy</button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="salesCanvas"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="card-title-bar">
+              <h3>Eng Ommabop Taomlar</h3>
+            </div>
+            <div class="top-dishes-list" id="top-dishes-container">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View 2: Kitchen Display Board (KDS) -->
+      <section class="view-section" id="view-kds">
+        <div class="kds-board">
+          <!-- Column 1: Yangi (New) -->
+          <div class="kds-column">
+            <div class="kds-col-header">
+              <div class="kds-col-title">
+                <span class="status-badge status-new"></span>
+                Yangi Buyurtmalar
+              </div>
+              <span class="badge-count" id="count-new">0</span>
+            </div>
+            <div class="kds-orders-container" id="kds-col-new">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Column 2: Pishirilmoqda (Cooking) -->
+          <div class="kds-column">
+            <div class="kds-col-header">
+              <div class="kds-col-title">
+                <span class="status-badge status-cooking"></span>
+                Pishirilmoqda
+              </div>
+              <span class="badge-count" id="count-cooking">0</span>
+            </div>
+            <div class="kds-orders-container" id="kds-col-cooking">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Column 3: Tayyor (Ready) -->
+          <div class="kds-column">
+            <div class="kds-col-header">
+              <div class="kds-col-title">
+                <span class="status-badge status-ready"></span>
+                Tayyor (Berishga)
+              </div>
+              <span class="badge-count" id="count-ready">0</span>
+            </div>
+            <div class="kds-orders-container" id="kds-col-ready">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Column 4: Berildi (Delivered) -->
+          <div class="kds-column">
+            <div class="kds-col-header">
+              <div class="kds-col-title">
+                <span class="status-badge status-delivered"></span>
+                Mijozga Berildi
+              </div>
+              <span class="badge-count" id="count-delivered">0</span>
+            </div>
+            <div class="kds-orders-container" id="kds-col-delivered">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View 3: POS / New Order -->
+      <section class="view-section" id="view-pos">
+        <div class="pos-layout">
+          <div class="pos-menu-section">
+            <div class="menu-search-bar">
+              <div class="search-input-wrap">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="pos-search" placeholder="Taom yoki ichimlik qidirish..." oninput="filterPosMenu()">
+              </div>
+            </div>
+
+            <div class="category-tabs" id="category-tabs-container">
+              <!-- Rendered via JS -->
+            </div>
+
+            <div class="menu-items-grid" id="pos-menu-grid">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- POS Cart Sidebar -->
+          <div class="pos-cart-panel">
+            <div class="cart-header">
+              <h3>Buyurtma Savatchasi</h3>
+              <span class="badge-count" id="cart-item-count">0 ta taom</span>
+            </div>
+
+            <div class="table-select-wrap">
+              <label for="select-table">Stol / Xizmat turi:</label>
+              <select id="select-table">
+                <option value="Stol #1">Stol #1 (Zal)</option>
+                <option value="Stol #2">Stol #2 (Zal)</option>
+                <option value="Stol #3">Stol #3 (VIP)</option>
+                <option value="Stol #4">Stol #4 (Zal)</option>
+                <option value="Olib ketish">Olib ketish (Takeaway)</option>
+                <option value="Dostavka">Dostavka (Yetkazib berish)</option>
+              </select>
+            </div>
+
+            <div class="cart-items-scroll" id="cart-items-list">
+              <!-- Rendered via JS -->
+            </div>
+
+            <div class="cart-summary">
+              <div class="summary-row">
+                <span>Jami taomlar:</span>
+                <span id="cart-subtotal">0 UZS</span>
+              </div>
+              <div class="summary-row">
+                <span>Xizmat haqi (10%):</span>
+                <span id="cart-service">0 UZS</span>
+              </div>
+              <div class="summary-row total">
+                <span>Jami to'lov:</span>
+                <span id="cart-total">0 UZS</span>
+              </div>
+
+              <button class="btn-primary btn-checkout" onclick="submitPosOrder()">
+                🚀 Buyurtmani Oshxonaga Yuborish
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View 4: Menu & Stock Management -->
+      <section class="view-section" id="view-menu">
+        <div class="card-title-bar" style="margin-bottom: 20px;">
+          <h3>Taomlar Menyusi va Mavjudligi</h3>
+          <button class="btn-primary" onclick="openAddDishModal()">+ Yangi Taom Qo'shish</button>
+        </div>
+
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+            <thead>
+              <tr style="background: var(--bg-sidebar); border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+                <th style="padding: 14px 20px;">Taom</th>
+                <th style="padding: 14px 20px;">Kategoriya</th>
+                <th style="padding: 14px 20px;">Narxi</th>
+                <th style="padding: 14px 20px;">Holati</th>
+                <th style="padding: 14px 20px; text-align: right;">Boshqarish</th>
+              </tr>
+            </thead>
+            <tbody id="menu-management-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Modal: Receipt Preview -->
+  <div class="modal-overlay" id="receipt-modal">
+    <div class="modal-box">
+      <div class="receipt-header">
+        <h2>OSHMASHIN RESTORAN</h2>
+        <p style="font-size: 12px; color: var(--text-muted);">Toshkent sh., Chilonzor t. • Tel: +998 71 200-00-00</p>
+      </div>
+
+      <div class="receipt-body" id="receipt-modal-body">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div style="display: flex; gap: 12px;">
+        <button class="btn-secondary" style="flex: 1;" onclick="closeReceiptModal()">Yopish</button>
+        <button class="btn-primary" style="flex: 1;" onclick="printReceipt()">🖨 Chek Chiqarish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add New Dish -->
+  <div class="modal-overlay" id="add-dish-modal">
+    <div class="modal-box">
+      <h3 style="margin-bottom: 18px;">Yangi Taom Qo'shish</h3>
+      <form id="add-dish-form" onsubmit="saveNewDish(event)">
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Taom Nomi:</label>
+          <input type="text" id="dish-name" required style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+        </div>
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Kategoriya:</label>
+          <select id="dish-category" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+            <option value="Milliy Taomlar">Milliy Taomlar</option>
+            <option value="Kabablar">Kabablar</option>
+            <option value="Sho'rbalar">Sho'rbalar</option>
+            <option value="Salatlar">Salatlar</option>
+            <option value="Ichimliklar">Ichimliklar</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 18px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Narxi (UZS):</label>
+          <input type="number" id="dish-price" required style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeAddDishModal()">Bekor Qilish</button>
+          <button type="submit" class="btn-primary" style="flex: 1;">Saqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
