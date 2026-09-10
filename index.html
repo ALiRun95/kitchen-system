@@ -271,19 +271,52 @@
       <section class="view-section" id="view-pos">
         <div class="pos-layout">
           <div class="pos-menu-section">
-            <div class="menu-search-bar">
-              <div class="search-input-wrap">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="pos-search" placeholder="Taom yoki ichimlik qidirish..." oninput="filterPosMenu()">
+            <!-- POS Sub-View Switcher: Menu vs Floor Plan -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+              <div class="filter-pills" style="display: flex; gap: 8px;">
+                <button class="pill active" id="pos-tab-menu" onclick="switchPosSubView('menu')" style="border: 1px solid var(--accent-amber); font-size: 13px; padding: 6px 14px;">🍽️ Taomlar Menyusi</button>
+                <button class="pill" id="pos-tab-floor" onclick="switchPosSubView('floor')" style="border: 1px solid var(--border-color); font-size: 13px; padding: 6px 14px;">🗺️ Stollar Xaritasi (Floor Plan)</button>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">
+                👤 Kassir: <strong style="color: var(--accent-gold);">Alisher (Smena #1)</strong>
               </div>
             </div>
 
-            <div class="category-tabs" id="category-tabs-container">
-              <!-- Rendered via JS -->
+            <!-- SubView 1: Menu Grid -->
+            <div id="pos-subview-menu">
+              <div class="menu-search-bar">
+                <div class="search-input-wrap">
+                  <span class="search-icon">🔍</span>
+                  <input type="text" id="pos-search" placeholder="Taom yoki ichimlik qidirish..." oninput="filterPosMenu()">
+                </div>
+              </div>
+
+              <div class="category-tabs" id="category-tabs-container">
+                <!-- Rendered via JS -->
+              </div>
+
+              <div class="menu-items-grid" id="pos-menu-grid">
+                <!-- Rendered via JS -->
+              </div>
             </div>
 
-            <div class="menu-items-grid" id="pos-menu-grid">
-              <!-- Rendered via JS -->
+            <!-- SubView 2: Interactive Table Floor Plan (Stollar Xaritasi) -->
+            <div id="pos-subview-floor" style="display: none;">
+              <div class="card-title-bar" style="margin-bottom: 16px;">
+                <div>
+                  <h3 style="font-size: 16px;">🗺️ Restoran Zallari va Stollar Holati</h3>
+                  <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Stolni tanlang va to'g'ridan-to'g'ri buyurtma oching</p>
+                </div>
+                <div style="display: flex; gap: 12px; font-size: 11px; font-weight: 700;">
+                  <span style="display: flex; align-items: center; gap: 4px; color: #10b981;">● Bo'sh</span>
+                  <span style="display: flex; align-items: center; gap: 4px; color: #ef4444;">● Band</span>
+                  <span style="display: flex; align-items: center; gap: 4px; color: #f59e0b;">● Tayyorlanmoqda</span>
+                </div>
+              </div>
+
+              <div id="floor-plan-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;">
+                <!-- Rendered via JS -->
+              </div>
             </div>
           </div>
 
@@ -313,10 +346,34 @@
               <!-- Rendered via JS -->
             </div>
 
+            <!-- POS Payment & Discounts Control -->
+            <div style="background: var(--bg-sidebar); border-radius: 8px; border: 1px solid var(--border-color); padding: 10px; margin-bottom: 10px;">
+              <label style="font-size: 11px; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 6px;">💳 To'lov Usuli:</label>
+              <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+                <button type="button" class="pill active" id="pay-method-cash" onclick="selectPaymentMethod('Naqd')" style="flex: 1; border: 1px solid var(--accent-amber); font-size: 11px; padding: 5px 4px;">💵 Naqd</button>
+                <button type="button" class="pill" id="pay-method-card" onclick="selectPaymentMethod('Karta')" style="flex: 1; border: 1px solid var(--border-color); font-size: 11px; padding: 5px 4px;">💳 Karta</button>
+                <button type="button" class="pill" id="pay-method-app" onclick="selectPaymentMethod('Payme/Click')" style="flex: 1; border: 1px solid var(--border-color); font-size: 11px; padding: 5px 4px;">📱 Payme</button>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Chegirma:</label>
+                <div style="display: flex; gap: 4px;">
+                  <button type="button" class="pill active" id="pos-disc-0" onclick="applyPosDiscount(0)" style="padding: 2px 8px; font-size: 10px; border: 1px solid var(--accent-amber);">0%</button>
+                  <button type="button" class="pill" id="pos-disc-5" onclick="applyPosDiscount(5)" style="padding: 2px 8px; font-size: 10px; border: 1px solid var(--border-color);">-5%</button>
+                  <button type="button" class="pill" id="pos-disc-10" onclick="applyPosDiscount(10)" style="padding: 2px 8px; font-size: 10px; border: 1px solid var(--border-color);">-10%</button>
+                  <button type="button" class="pill" id="pos-disc-20" onclick="applyPosDiscount(20)" style="padding: 2px 8px; font-size: 10px; border: 1px solid var(--border-color);">-20%</button>
+                </div>
+              </div>
+            </div>
+
             <div class="cart-summary">
               <div class="summary-row">
                 <span>Jami taomlar:</span>
                 <span id="cart-subtotal">0 UZS</span>
+              </div>
+              <div class="summary-row" id="cart-discount-row" style="display: none; color: #10b981;">
+                <span>Chegirma (<span id="cart-discount-pct">0</span>%):</span>
+                <span id="cart-discount-val">-0 UZS</span>
               </div>
               <div class="summary-row">
                 <span>Xizmat haqi (10%):</span>
@@ -657,8 +714,10 @@
     </div>
 
     <!-- Quick AI Prompts Panning Bar -->
-    <div class="ai-quick-prompts">
+    <div class="ai-quick-prompts" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px;">
+      <button type="button" onclick="askAiAgent('health')">🏆 Biznes holati</button>
       <button type="button" onclick="askAiAgent('sales')">💡 Sotuvni oshirish</button>
+      <button type="button" onclick="askAiAgent('forecast')">🥩 Masalliq ehtiyoji</button>
       <button type="button" onclick="askAiAgent('promo')">🔥 Aksiya maslahati</button>
       <button type="button" onclick="askAiAgent('kds')">⚡ Oshxona tezligi</button>
       <button type="button" onclick="askAiAgent('menu')">📋 Menyu tahlili</button>
