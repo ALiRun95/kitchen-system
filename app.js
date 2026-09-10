@@ -436,7 +436,18 @@ function changeOrderStatus(orderId, newStatus) {
   const order = orders.find(o => o.id === orderId);
   if (order) {
     order.status = newStatus;
+    if (newStatus === 'ready') {
+      playChimeSound('ready');
+      showToast(`🔔 ${order.id} (${order.table}) buyurtmasi TAYYOR bo'ldi! Offitsiantga xabar berildi.`);
+    } else if (newStatus === 'delivered') {
+      playChimeSound('chime');
+      showToast(`🚚 ${order.id} mijozga muvaffaqiyatli topshirildi.`);
+    } else if (newStatus === 'cooking') {
+      playChimeSound('chime');
+      showToast(`🔥 ${order.id} pishirish jarayoni boshlandi.`);
+    }
     renderKDSBoard();
+    renderFloorPlan();
   }
 }
 
@@ -794,43 +805,252 @@ function applyPosDiscount(pct) {
   renderCart();
 }
 
+let audioChimeEnabled = true;
+let audioCtx = null;
+
+function toggleAudioChime() {
+  audioChimeEnabled = !audioChimeEnabled;
+  const soundIcon = document.getElementById('sound-icon');
+  const soundText = document.getElementById('sound-text');
+  const btn = document.getElementById('sound-toggle-btn');
+  
+  if (soundIcon && soundText) {
+    soundIcon.innerText = audioChimeEnabled ? '🔊' : '🔇';
+    soundText.innerText = audioChimeEnabled ? 'Ovoz: Yoqilgan' : 'Ovoz: O\'chirilgan';
+  }
+  if (btn) {
+    btn.style.color = audioChimeEnabled ? 'var(--accent-gold)' : 'var(--text-muted)';
+    btn.style.borderColor = audioChimeEnabled ? 'rgba(255, 69, 0, 0.4)' : 'var(--border-color)';
+  }
+
+  if (audioChimeEnabled) {
+    playChimeSound('chime');
+    showToast('🔔 Ovozli bildirishnomalar yoqildi!');
+  } else {
+    showToast('🔇 Ovozli bildirishnomalar o\'chirildi.', 'info');
+  }
+}
+
+function playChimeSound(type = 'chime') {
+  if (!audioChimeEnabled) return;
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    if (!audioCtx) {
+      audioCtx = new AudioContextClass();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'sine';
+    if (type === 'ready') {
+      osc.frequency.setValueAtTime(587.33, now); // D5
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.18); // A5
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.5);
+    } else if (type === 'new') {
+      osc.frequency.setValueAtTime(523.25, now); // C5
+      osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.12); // E5
+      osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.28); // G5
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.65);
+    } else {
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.exponentialRampToValueAtTime(900, now + 0.2);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.4);
+    }
+  } catch (e) {
+    console.warn('Audio chime error:', e);
+  }
+}
+
+// Table Reservations Data Model (TastyIgniter / Dine-QR Architecture)
+let reservationsList = [
+  { id: 'res-1', table: 'Stol #3', customer: 'Rustam Karimov', phone: '+998 90 111 22 33', time: 'Bugun 19:30', guests: 4 },
+  { id: 'res-2', table: 'VIP Xona #2', customer: 'Jasur Bek', phone: '+998 93 555 88 99', time: 'Bugun 20:00', guests: 8 }
+];
+
+function openReservationModal(defaultTable = '') {
+  const modal = document.getElementById('reservation-modal');
+  if (!modal) return;
+
+  const select = document.getElementById('res-table-select');
+  if (select) {
+    select.innerHTML = tablesList.map(t => `<option value="${t.name}" ${t.name === defaultTable ? 'selected' : ''}>${t.name} (${t.zone}, ${t.capacity} kishilik)</option>`).join('');
+  }
+
+  modal.classList.add('active');
+}
+
+function closeReservationModal() {
+  const modal = document.getElementById('reservation-modal');
+  if (modal) modal.classList.remove('active');
+}
+
+function saveReservation(e) {
+  if (e) e.preventDefault();
+  const table = document.getElementById('res-table-select')?.value || 'Stol #1';
+  const customer = document.getElementById('res-guest-name')?.value?.trim();
+  const phone = document.getElementById('res-guest-phone')?.value?.trim();
+  const guests = parseInt(document.getElementById('res-guest-count')?.value) || 4;
+  const time = document.getElementById('res-time-input')?.value?.trim() || 'Bugun 19:00';
+
+  if (!customer) {
+    showToast('Iltimos, mijoz ismini kiriting!', 'error');
+    return;
+  }
+
+  const newRes = {
+    id: 'res-' + Date.now(),
+    table,
+    customer,
+    phone: phone || '+998 90 ...',
+    time,
+    guests
+  };
+
+  reservationsList.push(newRes);
+  playChimeSound('new');
+  showToast(`📅 ${table} "${customer}" nomiga muvaffaqiyatli band qilindi!`);
+  
+  closeReservationModal();
+  renderFloorPlan();
+
+  const form = document.getElementById('reservation-form');
+  if (form) form.reset();
+}
+
+function cancelReservation(id) {
+  reservationsList = reservationsList.filter(r => r.id !== id);
+  showToast('Bron bekor qilindi.', 'info');
+  renderFloorPlan();
+}
+
+// Digital QR Menu Modal (Dine-QR Integration)
+function openQrModal(tableName = 'Stol #1') {
+  const modal = document.getElementById('qr-menu-modal');
+  if (!modal) return;
+
+  const currentBase = window.location.href.split('#')[0];
+  const targetUrl = `${currentBase}#table=${encodeURIComponent(tableName)}`;
+  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(targetUrl)}`;
+
+  const titleEl = document.getElementById('qr-modal-table-title');
+  const imgEl = document.getElementById('qr-code-image');
+
+  if (titleEl) titleEl.innerText = `${tableName} uchun Raqamli QR Menyu`;
+  if (imgEl) {
+    imgEl.src = qrApiUrl;
+    imgEl.alt = `${tableName} QR Code`;
+  }
+
+  modal.classList.add('active');
+}
+
+function closeQrModal() {
+  const modal = document.getElementById('qr-menu-modal');
+  if (modal) modal.classList.remove('active');
+}
+
+// Daily Sales CSV / Excel Export (Restaurant-POS Feature)
+function exportDailySalesReportCSV() {
+  const now = new Date();
+  const dateStr = now.toISOString().split('T')[0];
+  
+  let csvContent = '\uFEFFID,Vaqt,Kategoriya,Stol / Mijoz,To\'lov Usuli,Holati,Buyurtma Tarkibi,Jami (UZS)\n';
+
+  orders.forEach(order => {
+    const itemsSummary = order.items.map(i => `${i.qty}x ${i.name}`).join(' | ');
+    const payment = order.paymentMethod || 'Naqd';
+    let statusText = 'Yangi';
+    if (order.status === 'delivered') statusText = 'Yetkazildi';
+    else if (order.status === 'ready') statusText = 'Tayyor';
+    else if (order.status === 'cooking') statusText = 'Pishirilmoqda';
+
+    csvContent += `"${order.id}","${order.time}","${order.category || 'Zal'}","${order.table}","${payment}","${statusText}","${itemsSummary}",${order.total}\n`;
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `XON_SHASHLIK_Sotuv_Hisoboti_${dateStr}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  playChimeSound('chime');
+  showToast('📥 Bugungi savdo hisoboti Excel/CSV formatida yuklab olindi!');
+}
+
 function renderFloorPlan() {
   const grid = document.getElementById('floor-plan-grid');
   if (!grid) return;
 
   grid.innerHTML = tablesList.map(table => {
     const activeOrder = orders.find(o => o.table === table.name && o.status !== 'delivered');
+    const reservation = reservationsList.find(r => r.table === table.name);
+
     let statusClass = '#10b981';
     let statusLabel = 'Bo\'sh';
     let statusBg = 'rgba(16, 185, 129, 0.15)';
-    let orderInfo = `<div style="font-size: 11px; color: #10b981; font-weight: 700;">Buyurtmaga tayyor</div>`;
+    let orderInfo = `<div style="font-size: 11px; color: #10b981; font-weight: 700;">🟢 Buyurtmaga tayyor</div>`;
 
     if (activeOrder) {
       if (activeOrder.status === 'new' || activeOrder.status === 'cooking') {
         statusClass = '#ef4444';
-        statusLabel = activeOrder.status === 'cooking' ? 'Pishirilmoqda' : 'Yangi Buyurtma';
+        statusLabel = activeOrder.status === 'cooking' ? '🔥 Pishirilmoqda' : '⚡ Yangi Buyurtma';
         statusBg = 'rgba(239, 68, 68, 0.15)';
         orderInfo = `<div style="font-size: 11px; color: #ef4444; font-weight: 800;">${activeOrder.id} • ${activeOrder.total.toLocaleString()} UZS</div>`;
       } else if (activeOrder.status === 'ready') {
         statusClass = '#f59e0b';
-        statusLabel = 'Tayyor (Berishga)';
+        statusLabel = '🍽 Tayyor';
         statusBg = 'rgba(245, 158, 11, 0.15)';
         orderInfo = `<div style="font-size: 11px; color: #f59e0b; font-weight: 800;">${activeOrder.id} • Tayyor</div>`;
       }
     }
 
+    const resBadge = reservation ? `
+      <div style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-flex; align-items: center; gap: 4px;">
+        📅 ${reservation.time} (${reservation.customer})
+      </div>
+    ` : '';
+
     return `
       <div style="background: var(--bg-card); border: 1.5px solid ${statusClass}; border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: all 0.2s ease; position: relative;" onclick="selectFloorTable('${table.name}', '${table.zone}')" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
           <div>
-            <h4 style="font-size: 15px; font-weight: 800; color: #fff;">${table.name}</h4>
-            <span style="font-size: 10px; color: var(--text-muted);">${table.zone} (${table.capacity} kishilik)</span>
+            <h4 style="font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 2px;">${table.name}</h4>
+            <span style="font-size: 11px; color: var(--text-muted);">${table.zone} (${table.capacity} kishilik)</span>
+            ${resBadge}
           </div>
           <span style="background: ${statusBg}; color: ${statusClass}; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; border: 1px solid ${statusClass};">${statusLabel}</span>
         </div>
-        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center; gap: 6px;">
           ${orderInfo}
-          <button class="btn-primary" style="padding: 4px 8px; font-size: 11px;" onclick="event.stopPropagation(); selectFloorTable('${table.name}', '${table.zone}')">Tanlash</button>
+          <div style="display: flex; gap: 4px;">
+            <button class="btn-secondary" style="padding: 4px 7px; font-size: 11px;" title="QR Menyu Kodini Ko'rish" onclick="event.stopPropagation(); openQrModal('${table.name}')">📱 QR</button>
+            <button class="btn-primary" style="padding: 4px 8px; font-size: 11px;" onclick="event.stopPropagation(); selectFloorTable('${table.name}', '${table.zone}')">Tanlash</button>
+          </div>
         </div>
       </div>
     `;
@@ -949,6 +1169,7 @@ function submitPosOrder() {
 
   renderKDSBoard();
   renderFloorPlan();
+  playChimeSound('new');
   openReceiptModal(newOrder);
 
   cart = [];
