@@ -1,81 +1,171 @@
 // Oshxona Operations & Sales Analytics Engine
 
-// Initial State Data
 let currentView = 'dashboard';
 let cart = [];
 let activeCategory = 'Barchasi';
 
-// Sample Menu Data with SVG/Emoji Icon fallbacks
-let menuData = [
-  { id: 1, name: "Toshkent Palovi (Osh)", category: "Milliy Taomlar", price: 42000, available: true, icon: "🍲", color: "linear-gradient(135deg, #f59e0b, #d97706)", salesCount: 142 },
-  { id: 2, name: "Qo'y Go'shtli Shashlik", category: "Kabablar", price: 28000, available: true, icon: "🍢", color: "linear-gradient(135deg, #ef4444, #b91c1c)", salesCount: 198 },
-  { id: 3, name: "Uyg'ur Lag'moni", category: "Milliy Taomlar", price: 38000, available: true, icon: "🍜", color: "linear-gradient(135deg, #8b5cf6, #6d28d9)", salesCount: 84 },
-  { id: 4, name: "Tandir Somsa (Go'shtli)", category: "Milliy Taomlar", price: 12000, available: true, icon: "🥟", color: "linear-gradient(135deg, #f97316, #c2410c)", salesCount: 310 },
-  { id: 5, name: "Achichuk Salati", category: "Salatlar", price: 16000, available: true, icon: "🥗", color: "linear-gradient(135deg, #10b981, #047857)", salesCount: 115 },
-  { id: 6, name: "Kola 1.5L / Qora Choy", category: "Ichimliklar", price: 14000, available: true, icon: "🥤", color: "linear-gradient(135deg, #3b82f6, #1d4ed8)", salesCount: 240 },
-  { id: 7, name: "Mastava Sho'rba", category: "Sho'rbalar", price: 32000, available: true, icon: "🥣", color: "linear-gradient(135deg, #eab308, #a16207)", salesCount: 62 }
+// Preset HD Realistic Food Photos for Picker Gallery
+const presetFoodPhotos = [
+  { name: "Plov (Osh)", url: "assets/plov.jpg" },
+  { name: "Shashlik", url: "assets/shashlik.jpg" },
+  { name: "Lag'mon", url: "assets/lagmon.jpg" },
+  { name: "Somsa", url: "assets/somsa.jpg" },
+  { name: "Salat", url: "assets/salat.jpg" },
+  { name: "Ichimlik", url: "assets/ichimlik.jpg" },
+  { name: "Sho'rba", url: "assets/shorba.jpg" },
+  { name: "Desert (Tort)", url: "assets/desert.jpg" },
+  { name: "Pitsa", url: "assets/pitsa.jpg" },
+  { name: "Burger", url: "assets/burger.jpg" },
+  { name: "Non / Pishiriq", url: "assets/somsa.jpg" },
+  { name: "Muzqaymoq", url: "assets/desert.jpg" }
 ];
 
-// Sample Active Orders
+// Categories Master List (Name & Realistic Photo Image)
+let categoriesList = [
+  { name: "🔥 XON Shashliklar", img: "assets/shashlik.jpg" },
+  { name: "👑 Maxsus Taomlar", img: "assets/plov.jpg" },
+  { name: "🍲 Sho'rbalar", img: "assets/shorba.jpg" },
+  { name: "🥗 Salatlar", img: "assets/salat.jpg" },
+  { name: "🍹 Ichimliklar", img: "assets/ichimlik.jpg" }
+];
+
+// Sample Menu Data
+let menuData = [
+  { id: 1, name: "👑 Xon Shashlik (Maxsus Qo'y)", category: "🔥 XON Shashliklar", price: 32000, available: true, img: "assets/shashlik.jpg", salesCount: 312 },
+  { id: 2, name: "🍢 Qo'y Qiyma Shashlik", category: "🔥 XON Shashliklar", price: 24000, available: true, img: "assets/shashlik.jpg", salesCount: 245 },
+  { id: 3, name: "🍗 Tovuq Go'shtli Shashlik", category: "🔥 XON Shashliklar", price: 22000, available: true, img: "assets/shashlik.jpg", salesCount: 198 },
+  { id: 4, name: "🍖 Jigar Shashlik (Parda Yog'li)", category: "🔥 XON Shashliklar", price: 20000, available: true, img: "assets/shashlik.jpg", salesCount: 156 },
+  { id: 5, name: "🍲 Xon Sho'rba (Suxak Go'shtli)", category: "🍲 Sho'rbalar", price: 35000, available: true, img: "assets/shorba.jpg", salesCount: 94 },
+  { id: 6, name: "🍚 Xon Palovi (Maxsus)", category: "👑 Maxsus Taomlar", price: 45000, available: true, img: "assets/plov.jpg", salesCount: 280 },
+  { id: 7, name: "🥗 Achichuk Salati", category: "🥗 Salatlar", price: 16000, available: true, img: "assets/salat.jpg", salesCount: 175 },
+  { id: 8, name: "🍹 Kola 1.5L / Qora Choy", category: "🍹 Ichimliklar", price: 14000, available: true, img: "assets/ichimlik.jpg", salesCount: 340 }
+];
+
+// Taomlar SET-lari Ro'yxati (Set Menus Master List)
+let setsData = [
+  {
+    id: 201,
+    title: "🍱 XON SHASHLIK Ziyofat SET-i (4 kishilik)",
+    desc: "4 Xon Shashlik + 2 Qiyma + 2 Achichuk Salati + 1.5L Kola va Tandir Patir",
+    price: 245000,
+    tag: "🔥 BESTSELLER",
+    img: "assets/set1.jpg"
+  },
+  {
+    id: 202,
+    title: "🍱 XON Tushlik SET-i",
+    desc: "2 Qo'y Qiyma Shashlik + 1 Xon Sho'rba + 1 Achichuk Salati + Qora Choy",
+    price: 78000,
+    tag: "POPULAR",
+    img: "assets/set2.jpg"
+  },
+  {
+    id: 203,
+    title: "🍢 Kabab Mix Assorti SET-i",
+    desc: "2 Xon Shashlik + 2 Tovuq Shashlik + 2 Jigar Shashlik + Achichuk va Souslar",
+    price: 155000,
+    tag: "MEAT LOVERS",
+    img: "assets/shashlik.jpg"
+  }
+];
+
+// Aksiyalar va Kombolar Ro'yxati
+let promotionsData = [
+  {
+    id: 101,
+    title: "🔥 XON SHASHLIK Olovli Kombosi",
+    desc: "4 Xon Shashlik (Qo'y) + 2 Qiyma Shashlik + 2 Kola 0.5L + Achichuk",
+    oldPrice: 198000,
+    newPrice: 149000,
+    discount: "-25%",
+    badge: "🔥 XON AKSIYA",
+    img: "assets/promo1.jpg"
+  },
+  {
+    id: 102,
+    title: "⚡ Ekspress Grill Seti",
+    desc: "2 Qo'y Qiyma Shashlik + 1 Qora Choy + Tandir Patir",
+    oldPrice: 62000,
+    newPrice: 48000,
+    discount: "-22%",
+    badge: "⏱ 12:00 - 16:00",
+    img: "assets/promo2.jpg"
+  }
+];
+
 let orders = [
   {
     id: "#1084",
+    category: "🍽 Zal (Stolda)",
     table: "Stol #2",
     time: "10 min oldin",
     status: "new",
     items: [
-      { name: "Toshkent Palovi (Osh)", qty: 2, price: 42000 },
+      { name: "👑 Xon Shashlik (Maxsus Qo'y)", qty: 3, price: 32000 },
       { name: "Achichuk Salati", qty: 1, price: 16000 },
       { name: "Kola 1.5L / Qora Choy", qty: 1, price: 14000 }
     ],
-    total: 114000
+    total: 126000
   },
   {
     id: "#1083",
+    category: "🍽 Zal (Stolda)",
     table: "Stol #4",
     time: "18 min oldin",
     status: "cooking",
     items: [
-      { name: "Qo'y Go'shtli Shashlik", qty: 4, price: 28000 },
-      { name: "Tandir Somsa (Go'shtli)", qty: 3, price: 12000 }
+      { name: "🍢 Qo'y Qiyma Shashlik", qty: 4, price: 24000 },
+      { name: "🍗 Tovuq Go'shtli Shashlik", qty: 2, price: 22000 }
     ],
-    total: 148000
+    total: 140000
   },
   {
     id: "#1082",
-    table: "VIP Stol",
+    category: "👑 VIP Xona",
+    table: "VIP Xona #1",
     time: "24 min oldin",
     status: "ready",
     items: [
-      { name: "Uyg'ur Lag'moni", qty: 2, price: 38000 },
+      { name: "👑 Xon Shashlik (Maxsus Qo'y)", qty: 4, price: 32000 },
       { name: "Achichuk Salati", qty: 2, price: 16000 }
     ],
-    total: 108000
+    total: 160000
   },
   {
     id: "#1081",
-    table: "Olib ketish",
+    category: "🛍 Olib ketish",
+    table: "Mijoz: Anvar (+998901234567)",
     time: "40 min oldin",
     status: "delivered",
     items: [
-      { name: "Toshkent Palovi (Osh)", qty: 3, price: 42000 }
+      { name: "🍚 Xon Palovi (Maxsus)", qty: 3, price: 45000 }
     ],
-    total: 126000
+    total: 135000
   }
 ];
 
-// App Initialization
-document.addEventListener('DOMContentLoaded', () => {
+function initApp() {
   startClock();
   renderTopDishes();
+  renderKdsCategoryFilterPills();
   renderKDSBoard();
   renderPosCategories();
+  renderPosOrderCategoriesDropdown();
   renderPosMenu();
   renderMenuManagement();
-  drawSalesChart('today');
-});
+  renderPromotions();
+  renderSets();
+  setTimeout(() => drawSalesChart('today'), 100);
+  populateDishCategoryDropdown();
+  renderPhotoPickerGallery();
+}
 
-// Realtime Clock
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  initApp();
+} else {
+  document.addEventListener('DOMContentLoaded', initApp);
+}
+
 function startClock() {
   const clockEl = document.getElementById('live-clock');
   function update() {
@@ -86,29 +176,50 @@ function startClock() {
   setInterval(update, 1000);
 }
 
-// Navigation Switcher
 function switchView(viewName) {
   currentView = viewName;
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
 
-  document.getElementById(`nav-${viewName}`).classList.add('active');
-  document.getElementById(`view-${viewName}`).classList.add('active');
+  const desktopNav = document.getElementById(`nav-${viewName}`);
+  if (desktopNav) desktopNav.classList.add('active');
+
+  const mobileNav = document.getElementById(`mobile-nav-${viewName}`);
+  if (mobileNav) mobileNav.classList.add('active');
+
+  const viewSec = document.getElementById(`view-${viewName}`);
+  if (viewSec) viewSec.classList.add('active');
 
   const titles = {
     dashboard: "Sotuvlar Statistikasi va Analitika",
     kds: "Oshxona Buyurtmalar Doskasi (KDS)",
     pos: "Kassa va Yangi Buyurtma Olish",
+    sets: "🔥 Taomlar SET-lari, Aksiyalar va Chegirma Kombolari",
+    promos: "🔥 Taomlar SET-lari, Aksiyalar va Chegirma Kombolari",
     menu: "Taomlar Menyusi va Mavjudligi Boshqaruvi"
   };
-  document.getElementById('page-title').innerText = titles[viewName];
+  const titleEl = document.getElementById('page-title');
+  if (titleEl) titleEl.innerText = titles[viewName] || titles.sets;
 
   if (viewName === 'dashboard') {
+    renderTopDishes();
     setTimeout(() => drawSalesChart('today'), 50);
+  } else if (viewName === 'kds') {
+    renderKdsCategoryFilterPills();
+    renderKDSBoard();
+  } else if (viewName === 'pos') {
+    renderPosCategories();
+    renderPosOrderCategoriesDropdown();
+    renderPosMenu();
+    renderCart();
+  } else if (viewName === 'sets' || viewName === 'promos') {
+    renderSets();
+  } else if (viewName === 'menu') {
+    renderMenuManagement();
   }
 }
 
-// Draw Sales Analytics Canvas Chart
 function drawSalesChart(range) {
   const canvas = document.getElementById('salesCanvas');
   if (!canvas) return;
@@ -139,7 +250,6 @@ function drawSalesChart(range) {
 
   ctx.clearRect(0, 0, width, height);
 
-  // Background Grid Lines
   ctx.strokeStyle = '#262c3d';
   ctx.lineWidth = 1;
   for (let i = 0; i <= 4; i++) {
@@ -150,14 +260,13 @@ function drawSalesChart(range) {
     ctx.stroke();
   }
 
-  // Draw Area Gradient
   const stepX = (width - 70) / (points.length - 1);
   const getX = (index) => 40 + index * stepX;
   const getY = (val) => height - 40 - ((val / maxVal) * (height - 70));
 
   const gradient = ctx.createLinearGradient(0, 0, 0, height);
-  gradient.addColorStop(0, 'rgba(245, 158, 11, 0.4)');
-  gradient.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
+  gradient.addColorStop(0, 'rgba(230, 57, 70, 0.45)');
+  gradient.addColorStop(1, 'rgba(230, 57, 70, 0.0)');
 
   ctx.beginPath();
   ctx.moveTo(getX(0), getY(points[0]));
@@ -171,31 +280,29 @@ function drawSalesChart(range) {
   ctx.fillStyle = gradient;
   ctx.fill();
 
-  // Draw Line
   ctx.beginPath();
   ctx.moveTo(getX(0), getY(points[0]));
   for (let i = 1; i < points.length; i++) {
     const cx = (getX(i - 1) + getX(i)) / 2;
     ctx.bezierCurveTo(cx, getY(points[i - 1]), cx, getY(points[i]), getX(i), getY(points[i]));
   }
-  ctx.strokeStyle = '#f59e0b';
+  ctx.strokeStyle = '#e63946';
   ctx.lineWidth = 3;
   ctx.stroke();
 
-  // Draw Points & Labels
   labels.forEach((label, i) => {
     const x = getX(i);
     const y = getY(points[i]);
 
     ctx.beginPath();
     ctx.arc(x, y, 5, 0, Math.PI * 2);
-    ctx.fillStyle = '#f59e0b';
+    ctx.fillStyle = '#ffb703';
     ctx.fill();
-    ctx.strokeStyle = '#0b0e14';
+    ctx.strokeStyle = '#070302';
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    ctx.fillStyle = '#9ca3af';
+    ctx.fillStyle = '#d8c8bd';
     ctx.fillText(label, x - 14, height - 15);
   });
 }
@@ -206,7 +313,6 @@ function updateChartRange(range) {
   drawSalesChart(range);
 }
 
-// Render Top Dishes List
 function renderTopDishes() {
   const container = document.getElementById('top-dishes-container');
   if (!container) return;
@@ -215,9 +321,7 @@ function renderTopDishes() {
   
   container.innerHTML = sorted.map((dish, idx) => `
     <div class="dish-rank-item">
-      <div style="width: 48px; height: 48px; border-radius: 8px; background: ${dish.color}; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-        ${dish.icon}
-      </div>
+      <img src="${dish.img}" onerror="this.onerror=null; this.src='assets/shashlik.jpg'" class="dish-img" alt="${dish.name}" style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover;">
       <div class="dish-info">
         <h4>#${idx + 1} ${dish.name}</h4>
         <span>${dish.category}</span>
@@ -230,7 +334,26 @@ function renderTopDishes() {
   `).join('');
 }
 
-// Render Kitchen Display Board (KDS)
+function renderKdsCategoryFilterPills() {
+  const container = document.getElementById('kds-category-filter-pills');
+  if (!container) return;
+
+  let html = `<button class="pill ${activeKdsOrderCategory === 'Barchasi' ? 'active' : ''}" style="border: 1px solid ${activeKdsOrderCategory === 'Barchasi' ? 'var(--accent-amber)' : 'var(--border-color)'}; font-size: 12px; padding: 4px 12px;" onclick="filterKdsByOrderCategory('Barchasi')">✨ Barchasi</button>`;
+
+  orderCategoriesList.forEach(cat => {
+    const isAct = activeKdsOrderCategory === cat.name;
+    html += `<button class="pill ${isAct ? 'active' : ''}" style="border: 1px solid ${isAct ? 'var(--accent-amber)' : 'var(--border-color)'}; font-size: 12px; padding: 4px 12px;" onclick="filterKdsByOrderCategory('${cat.name}')">${cat.name}</button>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function filterKdsByOrderCategory(catName) {
+  activeKdsOrderCategory = catName;
+  renderKdsCategoryFilterPills();
+  renderKDSBoard();
+}
+
 function renderKDSBoard() {
   const cols = {
     new: document.getElementById('kds-col-new'),
@@ -239,17 +362,25 @@ function renderKDSBoard() {
     delivered: document.getElementById('kds-col-delivered')
   };
 
-  const counts = { new: 0, cooking: 0, ready: 0, delivered: 0 };
+  if (!cols.new) return;
 
+  const counts = { new: 0, cooking: 0, ready: 0, delivered: 0 };
   Object.keys(cols).forEach(key => cols[key].innerHTML = '');
 
-  orders.forEach(order => {
+  const filteredOrders = orders.filter(order => {
+    return activeKdsOrderCategory === 'Barchasi' || order.category === activeKdsOrderCategory;
+  });
+
+  filteredOrders.forEach(order => {
     counts[order.status]++;
     const cardHtml = `
       <div class="order-card">
         <div class="order-card-header">
           <div>
-            <span class="order-id">${order.id}</span>
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+              <span class="order-id">${order.id}</span>
+              <span style="font-size: 10px; background: rgba(255, 69, 0, 0.2); color: var(--accent-amber); padding: 2px 6px; border-radius: 4px; font-weight: 700; border: 1px solid rgba(255, 69, 0, 0.3);">${order.category || '🍽 Zal'}</span>
+            </div>
             <div class="order-meta">${order.time}</div>
           </div>
           <span class="order-table">${order.table}</span>
@@ -298,16 +429,230 @@ function changeOrderStatus(orderId, newStatus) {
   }
 }
 
-// POS Categories & Menu Rendering
+// Render SET-lar Grid
+let activeSetsPromosFilter = 'all';
+
+function filterSetsPromos(filter) {
+  activeSetsPromosFilter = filter;
+
+  ['all', 'sets', 'promos'].forEach(f => {
+    const btn = document.getElementById(`filter-sp-${f}`);
+    if (btn) {
+      if (f === filter) {
+        btn.classList.add('active');
+        btn.style.borderColor = 'var(--accent-amber)';
+      } else {
+        btn.classList.remove('active');
+        btn.style.borderColor = 'var(--border-color)';
+      }
+    }
+  });
+
+  renderSets();
+}
+
+// Unified Render Function for SET-lar and Aksiyalar
+function renderSets() {
+  const container = document.getElementById('sets-promos-unified-grid') || document.getElementById('sets-grid-container');
+  if (!container) return;
+
+  let html = '';
+
+  // 1) Render SETs if filter is 'all' or 'sets'
+  if (activeSetsPromosFilter === 'all' || activeSetsPromosFilter === 'sets') {
+    setsData.forEach(setItem => {
+      html += `
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; position: relative;">
+          <div style="position: absolute; top: 12px; right: 12px; background: rgba(245, 158, 11, 0.95); color: #000; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 11px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+            🍱 ${setItem.tag || 'SET TO\'PLAM'}
+          </div>
+
+          <img src="${setItem.img}" onerror="this.onerror=null; this.src='assets/shashlik.jpg'" style="height: 160px; width: 100%; object-fit: cover;">
+          
+          <div style="padding: 20px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between;">
+            <div>
+              <h4 style="font-size: 16px; font-weight: 800; margin-bottom: 6px;">🍱 ${setItem.title}</h4>
+              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4;">${setItem.desc}</p>
+            </div>
+
+            <div>
+              <div style="font-size: 20px; font-weight: 800; color: var(--accent-amber); margin-bottom: 14px;">
+                ${setItem.price.toLocaleString()} UZS
+              </div>
+
+              <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="addSetToCart(${setItem.id})">
+                🛒 Kassaga SET Qo'shish
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  // 2) Render Promos if filter is 'all' or 'promos'
+  if (activeSetsPromosFilter === 'all' || activeSetsPromosFilter === 'promos') {
+    promotionsData.forEach(promo => {
+      html += `
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; position: relative;">
+          <div style="position: absolute; top: 12px; left: 12px; background: rgba(239, 68, 68, 0.95); color: #fff; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 12px; backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+            ${promo.discount}
+          </div>
+          <div style="position: absolute; top: 12px; right: 12px; background: rgba(15, 18, 26, 0.85); color: var(--accent-amber); padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 11px; border: 1px solid var(--border-color);">
+            ${promo.badge}
+          </div>
+
+          <img src="${promo.img}" onerror="this.onerror=null; this.src='assets/shashlik.jpg'" style="height: 160px; width: 100%; object-fit: cover;">
+          
+          <div style="padding: 20px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between;">
+            <div>
+              <h4 style="font-size: 16px; font-weight: 800; margin-bottom: 6px;">🔥 ${promo.title}</h4>
+              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4;">${promo.desc}</p>
+            </div>
+
+            <div>
+              <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px;">
+                <span style="font-size: 20px; font-weight: 800; color: var(--accent-amber);">${promo.newPrice.toLocaleString()} UZS</span>
+                <span style="font-size: 14px; color: var(--text-dim); text-decoration: line-through;">${promo.oldPrice.toLocaleString()} UZS</span>
+              </div>
+
+              <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="addPromoToCart(${promo.id})">
+                🛒 Kassaga Kombo Qo'shish
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  container.innerHTML = html;
+}
+
+function renderPromotions() {
+  renderSets();
+}
+
+function addSetToCart(setId) {
+  const setItem = setsData.find(s => s.id === setId);
+  if (!setItem) return;
+
+  const existing = cart.find(i => i.name === setItem.title);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({
+      id: setItem.id,
+      name: setItem.title,
+      price: setItem.price,
+      qty: 1
+    });
+  }
+
+  switchView('pos');
+  renderCart();
+}
+
+function openAddSetModal() {
+  document.getElementById('add-set-modal').classList.add('active');
+}
+
+function closeAddSetModal() {
+  document.getElementById('add-set-modal').classList.remove('active');
+}
+
+function saveNewSet(e) {
+  e.preventDefault();
+  const title = document.getElementById('set-title').value;
+  const desc = document.getElementById('set-desc').value;
+  const price = parseFloat(document.getElementById('set-price').value);
+  const img = document.getElementById('set-img').value;
+
+  const newSet = {
+    id: 200 + setsData.length + 1,
+    title: title,
+    desc: desc,
+    price: price,
+    tag: "CUSTOM SET",
+    img: img
+  };
+
+  setsData.unshift(newSet);
+  renderSets();
+  closeAddSetModal();
+  document.getElementById('add-set-form').reset();
+}
+
+function addPromoToCart(promoId) {
+  const promo = promotionsData.find(p => p.id === promoId);
+  if (!promo) return;
+
+  const existing = cart.find(i => i.name === promo.title);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({
+      id: promo.id,
+      name: promo.title,
+      price: promo.newPrice,
+      qty: 1
+    });
+  }
+
+  switchView('pos');
+  renderCart();
+}
+
+function openAddPromoModal() {
+  document.getElementById('add-promo-modal').classList.add('active');
+  calcAutoPromoPrice();
+}
+
+function closeAddPromoModal() {
+  document.getElementById('add-promo-modal').classList.remove('active');
+}
+
+function saveNewPromo(e) {
+  e.preventDefault();
+  const title = document.getElementById('promo-title').value;
+  const desc = document.getElementById('promo-desc').value;
+  const oldPrice = parseFloat(document.getElementById('promo-old-price').value);
+  const newPrice = parseFloat(document.getElementById('promo-new-price').value);
+  const img = document.getElementById('promo-img').value;
+
+  const pct = Math.round(((oldPrice - newPrice) / oldPrice) * 100);
+
+  const newPromo = {
+    id: 100 + promotionsData.length + 1,
+    title: title,
+    desc: desc,
+    oldPrice: oldPrice,
+    newPrice: newPrice,
+    discount: `-${pct}%`,
+    badge: "🔥 AKSIYA",
+    img: img
+  };
+
+  promotionsData.unshift(newPromo);
+  renderSets();
+  closeAddPromoModal();
+  document.getElementById('add-promo-form').reset();
+}
+
+// POS Categories with Realistic Dish Photo Avatar Thumbnails
 function renderPosCategories() {
   const container = document.getElementById('category-tabs-container');
-  const categories = ['Barchasi', ...new Set(menuData.map(d => d.category))];
-
-  container.innerHTML = categories.map(cat => `
-    <button class="cat-tab ${cat === activeCategory ? 'active' : ''}" onclick="selectPosCategory('${cat}')">
-      ${cat}
+  
+  let html = `<button class="cat-tab ${activeCategory === 'Barchasi' ? 'active' : ''}" onclick="selectPosCategory('Barchasi')">🍽️ Barchasi</button>`;
+  
+  html += categoriesList.map(cat => `
+    <button class="cat-tab ${cat.name === activeCategory ? 'active' : ''}" onclick="selectPosCategory('${cat.name}')" style="display: inline-flex; align-items: center; gap: 8px;">
+      <img src="${cat.img}" onerror="this.onerror=null; this.src='assets/shashlik.jpg'" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover;">
+      <span>${cat.name}</span>
     </button>
   `).join('');
+
+  container.innerHTML = html;
 }
 
 function selectPosCategory(cat) {
@@ -328,9 +673,7 @@ function renderPosMenu() {
 
   container.innerHTML = filtered.map(dish => `
     <div class="menu-card" onclick="addToCart(${dish.id})">
-      <div style="height: 110px; width: 100%; background: ${dish.color}; display: flex; align-items: center; justify-content: center; font-size: 48px;">
-        ${dish.icon}
-      </div>
+      <img src="${dish.img}" onerror="this.onerror=null; this.src='assets/shashlik.jpg'" class="menu-card-img" alt="${dish.name}" style="height: 125px; width: 100%; object-fit: cover;">
       <div class="menu-card-body">
         <div class="menu-card-title">${dish.name}</div>
         <div class="menu-card-price">${dish.price.toLocaleString()} UZS</div>
@@ -343,7 +686,6 @@ function filterPosMenu() {
   renderPosMenu();
 }
 
-// Cart Functions
 function addToCart(dishId) {
   const dish = menuData.find(d => d.id === dishId);
   if (!dish || !dish.available) return;
@@ -408,14 +750,19 @@ function submitPosOrder() {
     return;
   }
 
-  const table = document.getElementById('select-table').value;
+  const categorySelect = document.getElementById('select-order-category');
+  const category = categorySelect ? categorySelect.value : '🍽 Zal (Stolda)';
+  const detailInput = document.getElementById('order-detail-input');
+  const detail = detailInput ? detailInput.value : 'Stol #1';
+
   const newId = `#${1080 + orders.length + 1}`;
   const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
   const total = subtotal * 1.1;
 
   const newOrder = {
     id: newId,
-    table: table,
+    category: category,
+    table: detail,
     time: "Hozirgina",
     status: "new",
     items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
@@ -424,14 +771,13 @@ function submitPosOrder() {
 
   orders.unshift(newOrder);
 
-  // Update Metrics
   const revenueEl = document.getElementById('metric-revenue');
   const countEl = document.getElementById('metric-orders-count');
   
   let curRev = 4850000 + total;
   let curCount = 86 + 1;
-  revenueEl.innerText = `${curRev.toLocaleString()} UZS`;
-  countEl.innerText = `${curCount} ta`;
+  if (revenueEl) revenueEl.innerText = `${curRev.toLocaleString()} UZS`;
+  if (countEl) countEl.innerText = `${curCount} ta`;
 
   renderKDSBoard();
   openReceiptModal(newOrder);
@@ -440,7 +786,6 @@ function submitPosOrder() {
   renderCart();
 }
 
-// Receipt Modal
 function openReceiptModal(order) {
   const modal = document.getElementById('receipt-modal');
   const body = document.getElementById('receipt-modal-body');
@@ -448,7 +793,7 @@ function openReceiptModal(order) {
   body.innerHTML = `
     <div style="display: flex; justify-content: space-between; font-weight: 700;">
       <span>Chek kodi: ${order.id}</span>
-      <span>${order.table}</span>
+      <span style="color: var(--accent-gold);">${order.category || '🍽 Zal'} • ${order.table}</span>
     </div>
     <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Sana: ${new Date().toLocaleString('uz-UZ')}</div>
     
@@ -482,7 +827,6 @@ function openNewOrderModal() {
   switchView('pos');
 }
 
-// Menu & Stock Management Table
 function renderMenuManagement() {
   const tbody = document.getElementById('menu-management-tbody');
   if (!tbody) return;
@@ -490,9 +834,7 @@ function renderMenuManagement() {
   tbody.innerHTML = menuData.map(dish => `
     <tr style="border-bottom: 1px solid var(--border-color);">
       <td style="padding: 14px 20px; display: flex; align-items: center; gap: 12px;">
-        <div style="width: 36px; height: 36px; border-radius: 6px; background: ${dish.color}; display: flex; align-items: center; justify-content: center; font-size: 18px;">
-          ${dish.icon}
-        </div>
+        <img src="${dish.img}" onerror="this.onerror=null; this.src='assets/shashlik.jpg'" style="width: 36px; height: 36px; border-radius: 6px; object-fit: cover;">
         <strong>${dish.name}</strong>
       </td>
       <td style="padding: 14px 20px; color: var(--text-muted);">${dish.category}</td>
@@ -520,12 +862,91 @@ function toggleDishAvailability(id) {
   }
 }
 
+function populateDishCategoryDropdown() {
+  const select = document.getElementById('dish-category');
+  if (!select) return;
+
+  let options = categoriesList.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('');
+  select.innerHTML = options;
+}
+
+function renderPhotoPickerGallery() {
+  const gallery = document.getElementById('photo-picker-gallery');
+  if (!gallery) return;
+
+  gallery.innerHTML = presetFoodPhotos.map(item => `
+    <div style="cursor: pointer; text-align: center;" onclick="selectCategoryPhoto('${item.url}')">
+      <img src="${item.url}" onerror="this.onerror=null; this.src='assets/shashlik.jpg'" style="width: 100%; height: 50px; border-radius: 6px; object-fit: cover; border: 2px solid transparent; transition: border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent-amber)'" onmouseout="this.style.borderColor='transparent'">
+      <span style="font-size: 10px; color: var(--text-muted); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.name}</span>
+    </div>
+  `).join('');
+}
+
+function selectCategoryPhoto(url) {
+  document.getElementById('new-category-img').value = url;
+}
+
+function toggleQuickCategoryForm() {
+  const form = document.getElementById('quick-category-form');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function addQuickCategory() {
+  const nameInput = document.getElementById('quick-cat-name');
+  const name = nameInput.value.trim();
+  const img = presetFoodPhotos[0].url;
+
+  if (!name) {
+    alert("Kategoriya nomini kiriting!");
+    return;
+  }
+
+  if (!categoriesList.some(c => c.name === name)) {
+    categoriesList.push({ name: name, img: img });
+    populateDishCategoryDropdown();
+    renderPosCategories();
+    
+    document.getElementById('dish-category').value = name;
+  }
+
+  nameInput.value = '';
+  document.getElementById('quick-category-form').style.display = 'none';
+}
+
 function openAddDishModal() {
+  populateDishCategoryDropdown();
   document.getElementById('add-dish-modal').classList.add('active');
 }
 
 function closeAddDishModal() {
   document.getElementById('add-dish-modal').classList.remove('active');
+  document.getElementById('quick-category-form').style.display = 'none';
+}
+
+function openAddCategoryModal() {
+  renderPhotoPickerGallery();
+  document.getElementById('add-category-modal').classList.add('active');
+}
+
+function closeAddCategoryModal() {
+  document.getElementById('add-category-modal').classList.remove('active');
+}
+
+function saveNewCategory(e) {
+  e.preventDefault();
+  const name = document.getElementById('new-category-name').value.trim();
+  const img = document.getElementById('new-category-img').value.trim() || presetFoodPhotos[0].url;
+
+  if (name && !categoriesList.some(c => c.name === name)) {
+    categoriesList.push({ name: name, img: img });
+    activeCategory = name;
+    renderPosCategories();
+    populateDishCategoryDropdown();
+    renderPosMenu();
+  }
+
+  closeAddCategoryModal();
+  document.getElementById('add-category-form').reset();
 }
 
 function saveNewDish(e) {
@@ -534,13 +955,8 @@ function saveNewDish(e) {
   const category = document.getElementById('dish-category').value;
   const price = parseFloat(document.getElementById('dish-price').value);
 
-  const icons = {
-    "Milliy Taomlar": "🍲",
-    "Kabablar": "🍢",
-    "Sho'rbalar": "🥣",
-    "Salatlar": "🥗",
-    "Ichimliklar": "🥤"
-  };
+  const catObj = categoriesList.find(c => c.name === category);
+  const img = catObj ? catObj.img : presetFoodPhotos[0].url;
 
   const newDish = {
     id: menuData.length + 1,
@@ -548,8 +964,7 @@ function saveNewDish(e) {
     category: category,
     price: price,
     available: true,
-    icon: icons[category] || "🍽️",
-    color: "linear-gradient(135deg, #f59e0b, #d97706)",
+    img: img,
     salesCount: 0
   };
 
@@ -559,4 +974,238 @@ function saveNewDish(e) {
   renderPosMenu();
   closeAddDishModal();
   document.getElementById('add-dish-form').reset();
+}
+
+// ⚡ Automatic Realtime Discount & Price Calculator Engine
+function calcAutoPromoPrice() {
+  const oldPrice = parseFloat(document.getElementById('promo-old-price').value) || 0;
+  const pct = parseFloat(document.getElementById('promo-discount-pct').value) || 0;
+  
+  if (oldPrice > 0 && pct >= 0) {
+    const newPrice = Math.round(oldPrice * (1 - pct / 100));
+    document.getElementById('promo-new-price').value = newPrice;
+    
+    const badge = document.getElementById('promo-savings-badge');
+    if (badge) {
+      const savings = oldPrice - newPrice;
+      badge.style.display = 'block';
+      badge.innerHTML = `🎉 Mijoz ${savings.toLocaleString()} UZS (${pct}%) tejaydi!`;
+    }
+  }
+}
+
+function calcDiscountPctFromPrice() {
+  const oldPrice = parseFloat(document.getElementById('promo-old-price').value) || 0;
+  const newPrice = parseFloat(document.getElementById('promo-new-price').value) || 0;
+  
+  if (oldPrice > 0 && newPrice > 0 && newPrice < oldPrice) {
+    const pct = Math.round(((oldPrice - newPrice) / oldPrice) * 100);
+    document.getElementById('promo-discount-pct').value = pct;
+    
+    const badge = document.getElementById('promo-savings-badge');
+    if (badge) {
+      const savings = oldPrice - newPrice;
+      badge.style.display = 'block';
+      badge.innerHTML = `🎉 Mijoz ${savings.toLocaleString()} UZS (${pct}%) tejaydi!`;
+    }
+  }
+}
+
+function applyDiscountPct(pct) {
+  document.getElementById('promo-discount-pct').value = pct;
+  
+  const modal = document.getElementById('add-promo-modal');
+  if (modal) {
+    modal.querySelectorAll('.pill').forEach(btn => {
+      if (btn.textContent.trim() === `-${pct}%`) {
+        btn.classList.add('active');
+        btn.style.borderColor = 'var(--accent-amber)';
+      } else {
+        btn.classList.remove('active');
+        btn.style.borderColor = 'var(--border-color)';
+      }
+    });
+  }
+  
+  calcAutoPromoPrice();
+}
+
+// 📂 Order Categories (Buyurtma Kategoriyalari) Engine
+function renderPosOrderCategoriesDropdown() {
+  const select = document.getElementById('select-order-category');
+  if (!select) return;
+
+  select.innerHTML = orderCategoriesList.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+  onOrderCategoryChange();
+}
+
+function onOrderCategoryChange() {
+  const select = document.getElementById('select-order-category');
+  const input = document.getElementById('order-detail-input');
+  const label = document.getElementById('order-detail-label');
+  if (!select || !input) return;
+
+  const selectedName = select.value;
+  const cat = orderCategoriesList.find(c => c.name === selectedName);
+
+  if (cat) {
+    if (label) label.innerText = `${cat.name} Tafsiloti:`;
+    input.placeholder = cat.placeholder || 'Tafsilot...';
+    if (!input.value || input.value.startsWith('Stol #') || input.value.startsWith('Mijoz') || input.value.startsWith('VIP') || input.value.startsWith('Chilonzor') || input.value.startsWith('Tafsilot')) {
+      input.value = cat.placeholder;
+    }
+  }
+}
+
+function openAddOrderCategoryModal() {
+  document.getElementById('add-order-category-modal').classList.add('active');
+}
+
+function closeAddOrderCategoryModal() {
+  document.getElementById('add-order-category-modal').classList.remove('active');
+}
+
+function saveNewOrderCategory(e) {
+  e.preventDefault();
+  const nameInput = document.getElementById('new-order-cat-name');
+  const placeholderInput = document.getElementById('new-order-cat-placeholder');
+  const name = nameInput ? nameInput.value.trim() : '';
+  const placeholder = placeholderInput ? placeholderInput.value.trim() : '';
+
+  if (name && !orderCategoriesList.some(c => c.name === name)) {
+    orderCategoriesList.push({
+      id: `cat_${Date.now()}`,
+      name: name,
+      placeholder: placeholder || 'Tafsilot...'
+    });
+
+    activeKdsOrderCategory = name;
+    renderKdsCategoryFilterPills();
+    renderPosOrderCategoriesDropdown();
+
+    const orderCatSelect = document.getElementById('select-order-category');
+    if (orderCatSelect) {
+      orderCatSelect.value = name;
+      onOrderCategoryChange();
+    }
+    renderKDSBoard();
+  }
+
+  closeAddOrderCategoryModal();
+  if (document.getElementById('add-order-category-form')) {
+    document.getElementById('add-order-category-form').reset();
+  }
+}
+
+// 🤖 XON SHASHLIK Smart AI Advisor Agent Engine
+function toggleAiAgentModal() {
+  const modal = document.getElementById('ai-agent-modal');
+  if (!modal) return;
+  modal.classList.toggle('active');
+
+  const container = document.getElementById('ai-chat-messages');
+  if (container) container.scrollTop = container.scrollHeight;
+}
+
+function askAiAgent(topic) {
+  const responses = {
+    sales: "📊 <strong>Sotuv Analitikasi Maslahati:</strong><br>Bugungi eng xaridorgir taomimiz — <strong>'👑 Xon Shashlik (Maxsus Qo\'y)'</strong> (312 ta sotildi). Bugun o'rtacha tushum 4.8 mln UZS ga yetdi. Kechki 18:00–21:00 pik vaqtlarida <strong>'XON SHASHLIK Ziyofat SET-i'</strong> ni birinchi o'ringa sursak, kunlik tushum yana +18% ga oshadi!",
+    promo: "🔥 <strong>Aksiya va Kombo Maslahati:</strong><br>Hozirgi <strong>'XON SHASHLIK Olovli Kombosi' (-25%)</strong> mijozlar orasida eng mashhur. Maslahatim: Ish kunlari 12:00 dan 16:00 gacha <strong>'Ekspress Grill Seti'</strong> ga bepul limonli choy qo'shish taklifi berilsa, tushlik tushumi 30% ga o'sadi.",
+    kds: "⚡ <strong>Oshxona (KDS) Tezligi Tahlili:</strong><br>Hozirda pishirilayotgan buyurtmalar 2 ta. O'rtacha tayyorlanish vaqti — <strong>12-14 daqiqa</strong>. Oshpazlarga tavsiya: Qo'y qiyma shashliklarni oldindan tayyorlab turish buyurtma topshirish vaqtini 5 minutga qisqartiradi!",
+    menu: "📋 <strong>Menyu va Zaxira Nazorati:</strong><br>Tizimda 8 xil taom faol. Ichimliklar va Achichuk salati deyarli har bir buyurtmada sotilmoqda. Kamroq sotilayotgan taomlarni SET-lar tarkibiga qo'shish orqali ularning sotilish hajmini 2 baravarga oshirish mumkin."
+  };
+
+  const userLabels = {
+    sales: "💡 Sotuvni oshirish bo'yicha maslahat bering",
+    promo: "🔥 Qanday yangi aksiya qilishni tavsiya etasiz?",
+    kds: "⚡ Oshxona va KDS tezligini qanday oshiramiz?",
+    menu: "📋 Menyudagi taomlar tahlili qanday?"
+  };
+
+  appendAiUserMessage(userLabels[topic] || "Maslahat bering");
+  
+  showAiTypingIndicator();
+  setTimeout(() => {
+    removeAiTypingIndicator();
+    appendAiBotMessage(responses[topic] || "Tizim ma'lumotlari tahlil qilinmoqda...");
+  }, 700);
+}
+
+function handleAiChatSubmit(e) {
+  e.preventDefault();
+  const input = document.getElementById('ai-chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  appendAiUserMessage(text);
+  input.value = '';
+
+  showAiTypingIndicator();
+  setTimeout(() => {
+    removeAiTypingIndicator();
+    const reply = generateSmartAiReply(text);
+    appendAiBotMessage(reply);
+  }, 800);
+}
+
+function generateSmartAiReply(query) {
+  const q = query.toLowerCase();
+  if (q.includes('sotuv') || q.includes('daromad') || q.includes('pul') || q.includes('tushum')) {
+    return "📈 <strong>Sotuv Tahlili:</strong> Bugungi umumiy tushum 4.8 mln UZS. 'Xon Shashlik' yetakchi taom bo'lib turibdi. Sotuvni oshirish uchun VIP zallarda maxsus 'Kabab Mix Assorti' taklif qiling!";
+  } else if (q.includes('aksiya') || q.includes('chegirma') || q.includes('kombo')) {
+    return "🔥 <strong>Aksiya Strategiyasi:</strong> Aksiyalar bo'limida avtomatik chegirma kalkulyatoridan foydalanib 15-20% lik tezkor kombolar yaratishingizni maslahat beraman!";
+  } else if (q.includes('oshxona') || q.includes('kds') || q.includes('vaqt') || q.includes('oshpaz')) {
+    return "⚡ <strong>Oshxona Tezligi:</strong> KDS doskasida yangi buyurtmalar kelishi bilan oshpazlar pishirishni boshlash tugmasini bosishi jarayonni yanada shaffof qiladi.";
+  } else if (q.includes('shashlik') || q.includes('taom') || q.includes('palov')) {
+    return "👑 <strong>XON SHASHLIK Taomlari:</strong> Bizning qo'y go'shtli maxsus shashliklarimiz 85% ijobiy mijoz bahosiga ega. Zaxiralarni doimiy nazorat qilib boring!";
+  } else {
+    return `🤖 <strong>AI Maslahati:</strong> Savolingiz ("${query}") tahlil qilindi. XON SHASHLIK tizimida sotuvlarni oshirish va buyurtmalarni nazorat qilish uchun KDS va Kassa bo'limlaridan unumli foydalaning!`;
+  }
+}
+
+function appendAiUserMessage(msg) {
+  const container = document.getElementById('ai-chat-messages');
+  if (!container) return;
+
+  const html = `
+    <div class="ai-msg ai-msg-user">
+      <div class="ai-avatar">👤</div>
+      <div class="ai-bubble">${msg}</div>
+    </div>
+  `;
+  container.innerHTML += html;
+  container.scrollTop = container.scrollHeight;
+}
+
+function appendAiBotMessage(msg) {
+  const container = document.getElementById('ai-chat-messages');
+  if (!container) return;
+
+  const html = `
+    <div class="ai-msg ai-msg-bot">
+      <div class="ai-avatar">🤖</div>
+      <div class="ai-bubble">${msg}</div>
+    </div>
+  `;
+  container.innerHTML += html;
+  container.scrollTop = container.scrollHeight;
+}
+
+function showAiTypingIndicator() {
+  const container = document.getElementById('ai-chat-messages');
+  if (!container) return;
+
+  const html = `
+    <div class="ai-msg ai-msg-bot" id="ai-typing">
+      <div class="ai-avatar">🤖</div>
+      <div class="ai-bubble" style="color: var(--accent-gold); font-style: italic;">🤖 AI tahlil qilmoqda...</div>
+    </div>
+  `;
+  container.innerHTML += html;
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeAiTypingIndicator() {
+  const el = document.getElementById('ai-typing');
+  if (el) el.remove();
 }
