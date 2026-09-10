@@ -2,13 +2,18 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Oshxona Tizimlashtirish va Sotuv Analitikasi (Kitchen Operations OS)</title>
-  <meta name="description" content="Oshxona va restoranlar uchun sotuvlar analitikasi, buyurtmalar boshqaruvi va kassa tizimi.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#070302">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="referrer" content="no-referrer">
+  <title>XON SHASHLIK - Universal Boshqaruv va Sotuv Tizimi (OS)</title>
+  <meta name="description" content="XON SHASHLIK restorani uchun kompyuter va Android smartfonlarga moslashuvchan sotuvlar analitikasi, buyurtmalar boshqaruvi va kassa tizimi.">
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,17 +21,17 @@
   <div class="app-container">
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-icon">🍳</div>
+      <div class="brand" style="display: flex; align-items: center; gap: 12px; padding: 0 12px 20px 12px; border-bottom: 1px solid var(--border-color);">
+        <img src="assets/logo.jpg" alt="XON SHASHLIK" style="width: 54px; height: 54px; border-radius: 12px; object-fit: cover; border: 2px solid #ff4500; box-shadow: 0 0 15px rgba(255, 69, 0, 0.4);">
         <div class="brand-title">
-          <h2>OSHMASHIN</h2>
-          <span>Kitchen System</span>
+          <h2 style="font-size: 19px; font-weight: 900; background: linear-gradient(135deg, #ff4500, #ffb703); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px;">XON SHASHLIK</h2>
+          <span style="font-size: 11px; color: var(--accent-gold); font-weight: 700;">Grill & Barbeque OS</span>
         </div>
       </div>
 
       <nav class="nav-menu">
         <div class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard')">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 00-2 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
           <span>Sotuv Statistikasi</span>
         </div>
         <div class="nav-item" id="nav-kds" onclick="switchView('kds')">
@@ -37,14 +42,29 @@
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path></svg>
           <span>Kassa / Yangi Buyurtma</span>
         </div>
-        <div class="nav-item" id="nav-menu" onclick="switchView('menu')">
+        <div class="nav-item" id="nav-sets" onclick="switchView('sets')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          <span>🔥 SET-lar, Aksiyalar & Kombolar</span>
+        </div>
+        <div class="nav-item" id="nav-menu" onclick="switchView('menu')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
           <span>Taomlar Menyu Nazorati</span>
         </div>
       </nav>
 
-      <div class="sidebar-footer">
-        Oshmashin OS v2.4 • Active
+      <div class="sidebar-footer" style="padding-top: 14px; border-top: 1px solid var(--border-color);">
+        <div style="font-size: 11px; font-weight: 700; color: var(--accent-gold); margin-bottom: 8px;">🔥 XON SHASHLIK Tarmoqlari:</div>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px;">
+          <a href="https://t.me/xonshashlikuz" target="_blank" style="color: #38bdf8; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+            <span>✈️ Telegram:</span> <strong>XONSHASHLIKUZ</strong>
+          </a>
+          <a href="https://instagram.com/xon_shashlik_uz" target="_blank" style="color: #e1306c; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+            <span>📸 Instagram:</span> <strong>XON_SHASHLIK_UZ</strong>
+          </a>
+          <a href="https://youtube.com" target="_blank" style="color: #ef4444; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+            <span>🔴 YouTube:</span> <strong>XON SHASHLIK</strong>
+          </a>
+        </div>
       </div>
     </aside>
 
@@ -141,6 +161,17 @@
 
       <!-- View 2: Kitchen Display Board (KDS) -->
       <section class="view-section" id="view-kds">
+        <!-- Order Category Filter Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--bg-card); padding: 14px 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color); flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <span style="font-size: 13px; font-weight: 700; color: var(--accent-gold);">📂 Buyurtma Kategoriyalari:</span>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="kds-category-filter-pills">
+              <!-- Dynamic Category Pills rendered via JS -->
+            </div>
+          </div>
+          <button class="btn-secondary" style="font-size: 12px; padding: 6px 14px; border: 1px solid var(--accent-amber); color: var(--accent-amber);" onclick="openAddOrderCategoryModal()">+ Yangi Kategoriya Qo'shish</button>
+        </div>
+
         <div class="kds-board">
           <!-- Column 1: Yangi (New) -->
           <div class="kds-column">
@@ -227,16 +258,19 @@
               <span class="badge-count" id="cart-item-count">0 ta taom</span>
             </div>
 
-            <div class="table-select-wrap">
-              <label for="select-table">Stol / Xizmat turi:</label>
-              <select id="select-table">
-                <option value="Stol #1">Stol #1 (Zal)</option>
-                <option value="Stol #2">Stol #2 (Zal)</option>
-                <option value="Stol #3">Stol #3 (VIP)</option>
-                <option value="Stol #4">Stol #4 (Zal)</option>
-                <option value="Olib ketish">Olib ketish (Takeaway)</option>
-                <option value="Dostavka">Dostavka (Yetkazib berish)</option>
+            <div class="table-select-wrap" style="background: var(--bg-sidebar); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label style="font-size: 12px; color: var(--text-muted); font-weight: 700;">📂 Buyurtma Kategoriyasi:</label>
+                <button type="button" style="background: none; border: none; color: var(--accent-gold); font-size: 11px; cursor: pointer; font-weight: 700;" onclick="openAddOrderCategoryModal()">+ Qo'shish</button>
+              </div>
+              <select id="select-order-category" onchange="onOrderCategoryChange()" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); padding: 9px; color: #fff; border-radius: 6px; font-weight: 700; font-size: 13px; margin-bottom: 10px;">
+                <!-- Rendered via JS -->
               </select>
+
+              <div>
+                <label style="font-size: 11px; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 4px;" id="order-detail-label">Stol Raqami / Mijoz Tafsiloti:</label>
+                <input type="text" id="order-detail-input" placeholder="Stol #1" value="Stol #1" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px; color: #fff; border-radius: 6px; font-size: 12px;">
+              </div>
             </div>
 
             <div class="cart-items-scroll" id="cart-items-list">
@@ -265,11 +299,40 @@
         </div>
       </section>
 
+      <!-- Unified View: SET-lar, Aksiyalar & Kombolar Section -->
+      <section class="view-section" id="view-sets">
+        <div class="card-title-bar" style="margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+          <div>
+            <h3>🔥 Taomlar SET-lari, Maxsus Aksiyalar va Kombolar</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Biznes tushlik, oilaviy jamlanmalar va chegirmali aksiya kombolari</p>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn-secondary" onclick="openAddPromoModal()">+ Yangi Aksiya Yaratish</button>
+            <button class="btn-primary" onclick="openAddSetModal()">+ Yangi SET Yaratish</button>
+          </div>
+        </div>
+
+        <!-- Tab Filter Pills for SETs vs Promos -->
+        <div class="filter-pills" style="margin-bottom: 24px; display: flex; gap: 10px; flex-wrap: wrap;" id="sets-promos-filter-pills">
+          <button class="pill active" id="filter-sp-all" onclick="filterSetsPromos('all')" style="border: 1px solid var(--accent-amber); font-size: 13px; padding: 6px 14px;">✨ Barchasi (SET va Aksiyalar)</button>
+          <button class="pill" id="filter-sp-sets" onclick="filterSetsPromos('sets')" style="border: 1px solid var(--border-color); font-size: 13px; padding: 6px 14px;">🍱 Taomlar SET-lari</button>
+          <button class="pill" id="filter-sp-promos" onclick="filterSetsPromos('promos')" style="border: 1px solid var(--border-color); font-size: 13px; padding: 6px 14px;">🔥 Aksiyalar & Chegirma Kombolari</button>
+        </div>
+
+        <!-- Combined Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;" id="sets-promos-unified-grid">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
       <!-- View 4: Menu & Stock Management -->
       <section class="view-section" id="view-menu">
         <div class="card-title-bar" style="margin-bottom: 20px;">
           <h3>Taomlar Menyusi va Mavjudligi</h3>
-          <button class="btn-primary" onclick="openAddDishModal()">+ Yangi Taom Qo'shish</button>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-secondary" onclick="openAddCategoryModal()">+ Yangi Kategoriya</button>
+            <button class="btn-primary" onclick="openAddDishModal()">+ Yangi Taom Qo'shish</button>
+          </div>
         </div>
 
         <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden;">
@@ -296,9 +359,11 @@
   <!-- Modal: Receipt Preview -->
   <div class="modal-overlay" id="receipt-modal">
     <div class="modal-box">
-      <div class="receipt-header">
-        <h2>OSHMASHIN RESTORAN</h2>
-        <p style="font-size: 12px; color: var(--text-muted);">Toshkent sh., Chilonzor t. • Tel: +998 71 200-00-00</p>
+      <div class="receipt-header" style="text-align: center;">
+        <img src="assets/logo.jpg" style="width: 64px; height: 64px; border-radius: 12px; margin-bottom: 8px; border: 2px solid #ff4500; object-fit: cover;">
+        <h2 style="color: #ff4500; font-weight: 900; font-size: 20px; letter-spacing: -0.5px;">XON SHASHLIK</h2>
+        <p style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Haqiqiy Olovli Grill va Shashlik Maskani</p>
+        <p style="font-size: 11px; color: var(--accent-gold); margin-top: 4px;">Telegram: @xonshashlikuz • Insta: @xon_shashlik_uz</p>
       </div>
 
       <div class="receipt-body" id="receipt-modal-body">
@@ -319,21 +384,31 @@
       <form id="add-dish-form" onsubmit="saveNewDish(event)">
         <div style="margin-bottom: 14px;">
           <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Taom Nomi:</label>
-          <input type="text" id="dish-name" required style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+          <input type="text" id="dish-name" required placeholder="Masalan: Manti" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
         </div>
+        
         <div style="margin-bottom: 14px;">
-          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Kategoriya:</label>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label style="font-size: 12px; color: var(--text-muted);">Kategoriya:</label>
+            <button type="button" class="btn-secondary" style="padding: 3px 8px; font-size: 11px; color: var(--accent-amber);" onclick="toggleQuickCategoryForm()">+ Yangi Kategoriya</button>
+          </div>
           <select id="dish-category" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
-            <option value="Milliy Taomlar">Milliy Taomlar</option>
-            <option value="Kabablar">Kabablar</option>
-            <option value="Sho'rbalar">Sho'rbalar</option>
-            <option value="Salatlar">Salatlar</option>
-            <option value="Ichimliklar">Ichimliklar</option>
+            <!-- Dynamic Categories loaded via JS -->
           </select>
         </div>
+
+        <!-- Quick Inline Category Creator -->
+        <div id="quick-category-form" style="margin-bottom: 14px; background: var(--bg-sidebar); padding: 12px; border-radius: 8px; border: 1px solid var(--accent-amber); display: none;">
+          <label style="font-size: 12px; color: var(--accent-amber); display: block; margin-bottom: 6px;">Yangi Kategoriya Yaratish:</label>
+          <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+            <input type="text" id="quick-cat-name" placeholder="Masalan: Desertlar" style="flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px; color: #fff; border-radius: 6px; font-size: 13px;">
+            <button type="button" class="btn-primary" style="padding: 8px 12px; font-size: 12px;" onclick="addQuickCategory()">Qo'shish</button>
+          </div>
+        </div>
+
         <div style="margin-bottom: 18px;">
           <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Narxi (UZS):</label>
-          <input type="number" id="dish-price" required style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+          <input type="number" id="dish-price" required placeholder="35000" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
         </div>
         <div style="display: flex; gap: 12px;">
           <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeAddDishModal()">Bekor Qilish</button>
@@ -341,6 +416,223 @@
         </div>
       </form>
     </div>
+  </div>
+
+  <!-- Modal: Add New SET -->
+  <div class="modal-overlay" id="add-set-modal">
+    <div class="modal-box" style="width: 480px;">
+      <h3 style="margin-bottom: 18px;">🍱 Yangi Taomlar SET-ini Yaratish</h3>
+      <form id="add-set-form" onsubmit="saveNewSet(event)">
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">SET Nomi:</label>
+          <input type="text" id="set-title" required placeholder="Masalan: Biznes Tushlik SET-i" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+        </div>
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">SET Tarkibi (Tavsifi):</label>
+          <input type="text" id="set-desc" required placeholder="1 Sho'rba + 1 Palov + 1 Salat + Choy" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+        </div>
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 12px; color: var(--accent-amber); display: block; margin-bottom: 6px;">SET Narxi (UZS):</label>
+          <input type="number" id="set-price" required placeholder="55000" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--accent-amber); padding: 10px; color: #fff; border-radius: 6px;">
+        </div>
+        <div style="margin-bottom: 18px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">SET Rasmi URL / Fayli:</label>
+          <input type="text" id="set-img" required placeholder="assets/shashlik.jpg" value="assets/shashlik.jpg" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px; font-size: 12px;">
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeAddSetModal()">Bekor Qilish</button>
+          <button type="submit" class="btn-primary" style="flex: 1;">SET-ni Saqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add New Category with Realistic HD Dish Photo Picker -->
+  <div class="modal-overlay" id="add-category-modal">
+    <div class="modal-box" style="width: 520px;">
+      <h3 style="margin-bottom: 18px;">Yangi Kategoriya va Haqiqiy Rasm Yaratish</h3>
+      <form id="add-category-form" onsubmit="saveNewCategory(event)">
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Kategoriya Nomi:</label>
+          <input type="text" id="new-category-name" required placeholder="Masalan: Desertlar & Shirinliklar" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+        </div>
+        
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Haqiqiy Taom Rasmi URL / Fayli (yoki pastdagilardan tanlang):</label>
+          <input type="text" id="new-category-img" required placeholder="assets/shashlik.jpg" value="assets/shashlik.jpg" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px; font-size: 13px;">
+          
+          <!-- HD Realistic Food Photo Picker Gallery -->
+          <div style="margin-top: 10px;">
+            <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 6px;">Tayyor HD Taomlar Galereyasi:</label>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: var(--bg-sidebar); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); max-height: 160px; overflow-y: auto;" id="photo-picker-gallery">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 20px;">
+          <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeAddCategoryModal()">Bekor Qilish</button>
+          <button type="submit" class="btn-primary" style="flex: 1;">Kategoriyani Saqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add New Promotion / Combo with Automatic Realtime Calculator -->
+  <div class="modal-overlay" id="add-promo-modal">
+    <div class="modal-box" style="width: 500px;">
+      <h3 style="margin-bottom: 18px;">🔥 Yangi Aksiya yoki Kombo Qo'shish</h3>
+      <form id="add-promo-form" onsubmit="saveNewPromo(event)">
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Aksiya Nomi:</label>
+          <input type="text" id="promo-title" required placeholder="Masalan: Tushlik Seti (-20%)" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+        </div>
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Tarkibi (Tavsifi):</label>
+          <input type="text" id="promo-desc" required placeholder="1 Lag'mon + 2 Somsa + 1 Choy" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+        </div>
+        
+        <!-- Smart Realtime Automatic Discount Calculator -->
+        <div style="background: var(--bg-sidebar); padding: 14px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 14px;">
+          <div style="display: flex; gap: 12px; margin-bottom: 10px;">
+            <div style="flex: 1;">
+              <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Eski Narx (UZS):</label>
+              <input type="number" id="promo-old-price" required placeholder="85800" oninput="calcAutoPromoPrice()" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+            </div>
+            <div style="width: 100px;">
+              <label style="font-size: 12px; color: #ef4444; display: block; margin-bottom: 4px;">Chegirma %:</label>
+              <input type="number" id="promo-discount-pct" placeholder="20" value="20" oninput="calcAutoPromoPrice()" style="width: 100%; background: var(--bg-card); border: 1px solid #ef4444; padding: 10px; color: #ef4444; font-weight: 800; border-radius: 6px; text-align: center;">
+            </div>
+          </div>
+
+          <!-- Quick Discount % Selector Buttons -->
+          <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+            <button type="button" class="pill" style="flex: 1; border: 1px solid var(--border-color);" onclick="applyDiscountPct(10)">-10%</button>
+            <button type="button" class="pill" style="flex: 1; border: 1px solid var(--border-color);" onclick="applyDiscountPct(15)">-15%</button>
+            <button type="button" class="pill active" style="flex: 1; border: 1px solid var(--accent-amber);" onclick="applyDiscountPct(20)">-20%</button>
+            <button type="button" class="pill" style="flex: 1; border: 1px solid var(--border-color);" onclick="applyDiscountPct(25)">-25%</button>
+            <button type="button" class="pill" style="flex: 1; border: 1px solid var(--border-color);" onclick="applyDiscountPct(30)">-30%</button>
+          </div>
+
+          <div>
+            <label style="font-size: 12px; color: var(--accent-amber); display: block; margin-bottom: 4px;">⚡ Hisoblangan Aksiya Narxi (UZS):</label>
+            <input type="number" id="promo-new-price" required placeholder="49000" oninput="calcDiscountPctFromPrice()" style="width: 100%; background: var(--bg-card); border: 1px solid var(--accent-amber); padding: 10px; color: var(--accent-amber); font-size: 16px; font-weight: 800; border-radius: 6px;">
+          </div>
+
+          <div id="promo-savings-badge" style="margin-top: 10px; font-size: 12px; font-weight: 700; color: #10b981; text-align: center; display: none;">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Rasm URL / Fayli:</label>
+          <input type="text" id="promo-img" required placeholder="assets/shashlik.jpg" value="assets/shashlik.jpg" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px; font-size: 12px;">
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeAddPromoModal()">Bekor Qilish</button>
+          <button type="submit" class="btn-primary" style="flex: 1;">Aksiyani E'lon Qilish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add New Order Category -->
+  <div class="modal-overlay" id="add-order-category-modal">
+    <div class="modal-box" style="width: 460px;">
+      <h3 style="margin-bottom: 18px;">📂 Yangi Buyurtma Kategoriyasi Qo'shish</h3>
+      <form id="add-order-category-form" onsubmit="saveNewOrderCategory(event)">
+        <div style="margin-bottom: 14px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Kategoriya Nomi va Belgisi (Emoji):</label>
+          <input type="text" id="new-order-cat-name" required placeholder="Masalan: ⚡ Express Dostavka" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+        </div>
+        
+        <div style="margin-bottom: 18px;">
+          <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Tafsilot Shabloni (Stol / Ism / Manzil):</label>
+          <input type="text" id="new-order-cat-placeholder" required placeholder="Masalan: Stol #... yoki Manzil..." value="Stol #" style="width: 100%; background: var(--bg-sidebar); border: 1px solid var(--border-color); padding: 10px; color: #fff; border-radius: 6px;">
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeAddOrderCategoryModal()">Bekor Qilish</button>
+          <button type="submit" class="btn-primary" style="flex: 1;">Kategoriyani Saqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Android / Mobile Universal Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav">
+    <div class="mobile-nav-item active" id="mobile-nav-dashboard" onclick="switchView('dashboard')">
+      <span class="mobile-nav-icon">📊</span>
+      <span>Sotuv</span>
+    </div>
+    <div class="mobile-nav-item" id="mobile-nav-kds" onclick="switchView('kds')">
+      <span class="mobile-nav-icon">🍳</span>
+      <span>KDS</span>
+    </div>
+    <div class="mobile-nav-item" id="mobile-nav-pos" onclick="switchView('pos')">
+      <span class="mobile-nav-icon">🛒</span>
+      <span>Kassa</span>
+    </div>
+    <div class="mobile-nav-item" id="mobile-nav-sets" onclick="switchView('sets')">
+      <span class="mobile-nav-icon">🍱</span>
+      <span>SET</span>
+    </div>
+    <div class="mobile-nav-item" id="mobile-nav-promos" onclick="switchView('promos')">
+      <span class="mobile-nav-icon">🔥</span>
+      <span>Aksiya</span>
+    </div>
+    <div class="mobile-nav-item" id="mobile-nav-menu" onclick="switchView('menu')">
+      <span class="mobile-nav-icon">📋</span>
+      <span>Menyu</span>
+    </div>
+  </nav>
+
+  <!-- Floating AI Advisor Agent Trigger Button -->
+  <div id="ai-agent-trigger" class="ai-agent-fab" onclick="toggleAiAgentModal()">
+    <div class="ai-agent-fab-icon">🤖</div>
+    <div class="ai-agent-fab-text">
+      <span>AI Maslahatchi</span>
+      <small style="color: #10b981; font-weight: 700;">● Online AI</small>
+    </div>
+  </div>
+
+  <!-- AI Advisor Agent Floating Modal Chat Drawer -->
+  <div class="ai-agent-modal" id="ai-agent-modal">
+    <div class="ai-agent-header">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 38px; height: 38px; background: linear-gradient(135deg, #ff4500, #ffb703); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 0 12px rgba(255,69,0,0.5);">🤖</div>
+        <div>
+          <h4 style="font-size: 15px; font-weight: 800; color: #fff; margin: 0;">XON SHASHLIK AI Maslahatchisi</h4>
+          <span style="font-size: 11px; color: var(--accent-gold); font-weight: 600;">Sotuv va Boshqaruv Aqlli Agenti</span>
+        </div>
+      </div>
+      <button class="ai-close-btn" onclick="toggleAiAgentModal()">✕</button>
+    </div>
+
+    <!-- AI Chat Messages Area -->
+    <div class="ai-chat-body" id="ai-chat-messages">
+      <div class="ai-msg ai-msg-bot">
+        <div class="ai-avatar">🤖</div>
+        <div class="ai-bubble">
+          Assalomu alaykum! Men <strong>XON SHASHLIK</strong> aqlli AI Maslahatchisiman. 👑🔥<br><br>
+          Bugungi sotuvlar analitikasi, taomlar ommabopligi yoki aksiya rejalari bo'yicha qanday maslahat kerak?
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick AI Prompts Panning Bar -->
+    <div class="ai-quick-prompts">
+      <button type="button" onclick="askAiAgent('sales')">💡 Sotuvni oshirish</button>
+      <button type="button" onclick="askAiAgent('promo')">🔥 Aksiya maslahati</button>
+      <button type="button" onclick="askAiAgent('kds')">⚡ Oshxona tezligi</button>
+      <button type="button" onclick="askAiAgent('menu')">📋 Menyu tahlili</button>
+    </div>
+
+    <!-- AI Chat Input Form -->
+    <form class="ai-chat-input-wrap" onsubmit="handleAiChatSubmit(event)">
+      <input type="text" id="ai-chat-input" placeholder="AI Agentga savol yoki topshiriq kiritishingiz mumkin..." required autocomplete="off">
+      <button type="submit" class="btn-primary" style="padding: 8px 14px; font-size: 13px;">Yuborish</button>
+    </form>
   </div>
 
   <script src="app.js"></script>
