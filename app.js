@@ -145,6 +145,7 @@ let orders = [
 ];
 
 function initApp() {
+  initSavedFont();
   startClock();
   renderTopDishes();
   renderKdsCategoryFilterPills();
@@ -159,6 +160,21 @@ function initApp() {
   populateDishCategoryDropdown();
   renderPhotoPickerGallery();
   renderFloorPlan();
+}
+
+function changeAppFont(fontVal) {
+  document.documentElement.style.setProperty('--font-family', fontVal);
+  document.body.style.fontFamily = fontVal;
+  localStorage.setItem('xon_shashlik_font', fontVal);
+  showToast(`🔤 Shrift o'zgartirildi: ${fontVal.split(',')[0].replace(/'/g, '')}`);
+}
+
+function initSavedFont() {
+  const saved = localStorage.getItem('xon_shashlik_font') || "'Outfit', sans-serif";
+  document.documentElement.style.setProperty('--font-family', saved);
+  document.body.style.fontFamily = saved;
+  const select = document.getElementById('font-family-selector');
+  if (select) select.value = saved;
 }
 
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
