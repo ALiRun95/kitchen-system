@@ -158,6 +158,7 @@ function initApp() {
   setTimeout(() => drawSalesChart('today'), 100);
   populateDishCategoryDropdown();
   renderPhotoPickerGallery();
+  renderFloorPlan();
 }
 
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -721,42 +722,195 @@ function updateCartQty(dishId, delta) {
   renderCart();
 }
 
+let tablesList = [
+  { id: "t1", name: "Stol #1", zone: "🍽 Asosiy Zal", capacity: 4 },
+  { id: "t2", name: "Stol #2", zone: "🍽 Asosiy Zal", capacity: 4 },
+  { id: "t3", name: "Stol #3", zone: "🍽 Asosiy Zal", capacity: 6 },
+  { id: "t4", name: "Stol #4", zone: "🍽 Asosiy Zal", capacity: 4 },
+  { id: "t5", name: "Stol #5", zone: "🍽 Asosiy Zal", capacity: 2 },
+  { id: "t6", name: "Stol #6", zone: "🍽 Asosiy Zal", capacity: 8 },
+  { id: "v1", name: "VIP Xona #1", zone: "👑 VIP Xonalar", capacity: 10 },
+  { id: "v2", name: "VIP Xona #2", zone: "👑 VIP Xonalar", capacity: 12 },
+  { id: "y1", name: "Ayvon #1", zone: "🌿 Yozgi Ayvon", capacity: 6 },
+  { id: "y2", name: "Ayvon #2", zone: "🌿 Yozgi Ayvon", capacity: 6 }
+];
+
+let posSubView = 'menu';
+let posPaymentMethod = 'Naqd';
+let posDiscountPct = 0;
+
+function switchPosSubView(view) {
+  posSubView = view;
+  const menuView = document.getElementById('pos-subview-menu');
+  const floorView = document.getElementById('pos-subview-floor');
+  const tabMenu = document.getElementById('pos-tab-menu');
+  const tabFloor = document.getElementById('pos-tab-floor');
+
+  if (view === 'menu') {
+    if (menuView) menuView.style.display = 'block';
+    if (floorView) floorView.style.display = 'none';
+    if (tabMenu) { tabMenu.classList.add('active'); tabMenu.style.borderColor = 'var(--accent-amber)'; }
+    if (tabFloor) { tabFloor.classList.remove('active'); tabFloor.style.borderColor = 'var(--border-color)'; }
+  } else {
+    if (menuView) menuView.style.display = 'none';
+    if (floorView) floorView.style.display = 'block';
+    if (tabFloor) { tabFloor.classList.add('active'); tabFloor.style.borderColor = 'var(--accent-amber)'; }
+    if (tabMenu) { tabMenu.classList.remove('active'); tabMenu.style.borderColor = 'var(--border-color)'; }
+    renderFloorPlan();
+  }
+}
+
+function selectPaymentMethod(method) {
+  posPaymentMethod = method;
+  ['cash', 'card', 'app'].forEach(m => {
+    const btn = document.getElementById(`pay-method-${m}`);
+    if (btn) {
+      const match = (m === 'cash' && method === 'Naqd') || (m === 'card' && method === 'Karta') || (m === 'app' && method.includes('Payme'));
+      if (match) {
+        btn.classList.add('active');
+        btn.style.borderColor = 'var(--accent-amber)';
+      } else {
+        btn.classList.remove('active');
+        btn.style.borderColor = 'var(--border-color)';
+      }
+    }
+  });
+}
+
+function applyPosDiscount(pct) {
+  posDiscountPct = pct;
+  [0, 5, 10, 20].forEach(p => {
+    const btn = document.getElementById(`pos-disc-${p}`);
+    if (btn) {
+      if (p === pct) {
+        btn.classList.add('active');
+        btn.style.borderColor = 'var(--accent-amber)';
+      } else {
+        btn.classList.remove('active');
+        btn.style.borderColor = 'var(--border-color)';
+      }
+    }
+  });
+  renderCart();
+}
+
+function renderFloorPlan() {
+  const grid = document.getElementById('floor-plan-grid');
+  if (!grid) return;
+
+  grid.innerHTML = tablesList.map(table => {
+    const activeOrder = orders.find(o => o.table === table.name && o.status !== 'delivered');
+    let statusClass = '#10b981';
+    let statusLabel = 'Bo\'sh';
+    let statusBg = 'rgba(16, 185, 129, 0.15)';
+    let orderInfo = `<div style="font-size: 11px; color: #10b981; font-weight: 700;">Buyurtmaga tayyor</div>`;
+
+    if (activeOrder) {
+      if (activeOrder.status === 'new' || activeOrder.status === 'cooking') {
+        statusClass = '#ef4444';
+        statusLabel = activeOrder.status === 'cooking' ? 'Pishirilmoqda' : 'Yangi Buyurtma';
+        statusBg = 'rgba(239, 68, 68, 0.15)';
+        orderInfo = `<div style="font-size: 11px; color: #ef4444; font-weight: 800;">${activeOrder.id} • ${activeOrder.total.toLocaleString()} UZS</div>`;
+      } else if (activeOrder.status === 'ready') {
+        statusClass = '#f59e0b';
+        statusLabel = 'Tayyor (Berishga)';
+        statusBg = 'rgba(245, 158, 11, 0.15)';
+        orderInfo = `<div style="font-size: 11px; color: #f59e0b; font-weight: 800;">${activeOrder.id} • Tayyor</div>`;
+      }
+    }
+
+    return `
+      <div style="background: var(--bg-card); border: 1.5px solid ${statusClass}; border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: all 0.2s ease; position: relative;" onclick="selectFloorTable('${table.name}', '${table.zone}')" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+          <div>
+            <h4 style="font-size: 15px; font-weight: 800; color: #fff;">${table.name}</h4>
+            <span style="font-size: 10px; color: var(--text-muted);">${table.zone} (${table.capacity} kishilik)</span>
+          </div>
+          <span style="background: ${statusBg}; color: ${statusClass}; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; border: 1px solid ${statusClass};">${statusLabel}</span>
+        </div>
+        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+          ${orderInfo}
+          <button class="btn-primary" style="padding: 4px 8px; font-size: 11px;" onclick="event.stopPropagation(); selectFloorTable('${table.name}', '${table.zone}')">Tanlash</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function selectFloorTable(tableName, zone) {
+  const detailInput = document.getElementById('order-detail-input');
+  if (detailInput) detailInput.value = tableName;
+
+  const catSelect = document.getElementById('select-order-category');
+  if (catSelect) {
+    if (tableName.includes('VIP')) {
+      catSelect.value = '👑 VIP Xona';
+    } else {
+      catSelect.value = '🍽 Zal (Stolda)';
+    }
+  }
+
+  showToast(`🎯 ${tableName} tanlandi! Endi taomlarni savatchaga qo'shing.`);
+  switchPosSubView('menu');
+}
+
 function renderCart() {
   const listEl = document.getElementById('cart-items-list');
   const countEl = document.getElementById('cart-item-count');
   
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  const service = subtotal * 0.1;
-  const total = subtotal + service;
+  const discountVal = Math.round(subtotal * (posDiscountPct / 100));
+  const afterDiscount = subtotal - discountVal;
+  const service = Math.round(afterDiscount * 0.1);
+  const total = afterDiscount + service;
 
-  countEl.innerText = `${cart.reduce((sum, i) => sum + i.qty, 0)} ta taom`;
+  if (countEl) countEl.innerText = `${cart.reduce((sum, i) => sum + i.qty, 0)} ta taom`;
 
-  listEl.innerHTML = cart.length === 0 ? `
-    <div style="text-align: center; color: var(--text-dim); padding: 40px 0;">
-      Savatcha bo'sh.<br>Menyudan taom tanlang.
-    </div>
-  ` : cart.map(item => `
-    <div class="cart-item">
-      <div>
-        <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-price">${item.price.toLocaleString()} UZS</div>
+  if (listEl) {
+    listEl.innerHTML = cart.length === 0 ? `
+      <div style="text-align: center; color: var(--text-dim); padding: 40px 0;">
+        Savatcha bo'sh.<br>Menyudan taom tanlang yoki Stollar xaritasidan stol belgilang.
       </div>
-      <div class="cart-qty-ctrl">
-        <button class="qty-btn" onclick="updateCartQty(${item.id}, -1)">-</button>
-        <span style="font-weight: 700; font-size: 13px;">${item.qty}</span>
-        <button class="qty-btn" onclick="updateCartQty(${item.id}, 1)">+</button>
+    ` : cart.map(item => `
+      <div class="cart-item">
+        <div>
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">${item.price.toLocaleString()} UZS</div>
+        </div>
+        <div class="cart-qty-ctrl">
+          <button class="qty-btn" onclick="updateCartQty(${item.id}, -1)">-</button>
+          <span style="font-weight: 700; font-size: 13px;">${item.qty}</span>
+          <button class="qty-btn" onclick="updateCartQty(${item.id}, 1)">+</button>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `).join('');
+  }
 
-  document.getElementById('cart-subtotal').innerText = `${subtotal.toLocaleString()} UZS`;
-  document.getElementById('cart-service').innerText = `${service.toLocaleString()} UZS`;
-  document.getElementById('cart-total').innerText = `${total.toLocaleString()} UZS`;
+  const subEl = document.getElementById('cart-subtotal');
+  const srvEl = document.getElementById('cart-service');
+  const totEl = document.getElementById('cart-total');
+  const discRow = document.getElementById('cart-discount-row');
+  const discPctEl = document.getElementById('cart-discount-pct');
+  const discValEl = document.getElementById('cart-discount-val');
+
+  if (subEl) subEl.innerText = `${subtotal.toLocaleString()} UZS`;
+  if (srvEl) srvEl.innerText = `${service.toLocaleString()} UZS`;
+  if (totEl) totEl.innerText = `${total.toLocaleString()} UZS`;
+
+  if (discRow && discPctEl && discValEl) {
+    if (posDiscountPct > 0) {
+      discRow.style.display = 'flex';
+      discPctEl.innerText = posDiscountPct;
+      discValEl.innerText = `-${discountVal.toLocaleString()} UZS`;
+    } else {
+      discRow.style.display = 'none';
+    }
+  }
 }
 
 function submitPosOrder() {
   if (cart.length === 0) {
-    alert("Iltimos, avval savatchaga taom qo'shing!");
+    showToast("Iltimos, avval savatchaga taom qo'shing!", "error");
     return;
   }
 
@@ -767,7 +921,9 @@ function submitPosOrder() {
 
   const newId = `#${1080 + orders.length + 1}`;
   const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-  const total = subtotal * 1.1;
+  const discountVal = Math.round(subtotal * (posDiscountPct / 100));
+  const afterDiscount = subtotal - discountVal;
+  const total = Math.round(afterDiscount * 1.1);
 
   const newOrder = {
     id: newId,
@@ -775,6 +931,8 @@ function submitPosOrder() {
     table: detail,
     time: "Hozirgina",
     status: "new",
+    paymentMethod: posPaymentMethod,
+    discountPct: posDiscountPct,
     items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
     total: total
   };
@@ -790,22 +948,29 @@ function submitPosOrder() {
   if (countEl) countEl.innerText = `${curCount} ta`;
 
   renderKDSBoard();
+  renderFloorPlan();
   openReceiptModal(newOrder);
 
   cart = [];
+  posDiscountPct = 0;
+  applyPosDiscount(0);
   renderCart();
+  showToast(`🚀 ${newId} raqamli buyurtma oshxonaga yuborildi!`);
 }
 
 function openReceiptModal(order) {
   const modal = document.getElementById('receipt-modal');
   const body = document.getElementById('receipt-modal-body');
 
+  const payEmoji = order.paymentMethod === 'Karta' ? '💳 Plastik Karta' : (order.paymentMethod?.includes('Payme') ? '📱 Payme / Click' : '💵 Naqd Pul');
+
   body.innerHTML = `
     <div style="display: flex; justify-content: space-between; font-weight: 700;">
       <span>Chek kodi: ${order.id}</span>
       <span style="color: var(--accent-gold);">${order.category || '🍽 Zal'} • ${order.table}</span>
     </div>
-    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Sana: ${new Date().toLocaleString('uz-UZ')}</div>
+    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">Sana: ${new Date().toLocaleString('uz-UZ')}</div>
+    <div style="font-size: 12px; color: #10b981; font-weight: 700; margin-bottom: 12px;">To'lov: ${payEmoji} ${order.discountPct > 0 ? `• Chegirma: -${order.discountPct}%` : ''}</div>
     
     <div style="border-top: 1px dashed var(--border-color); padding-top: 10px;">
       ${order.items.map(item => `
@@ -1161,6 +1326,8 @@ function toggleAiAgentModal() {
 
 function askAiAgent(topic) {
   const responses = {
+    health: "🏆 <strong>XON SHASHLIK Biznes Salomatligi Ko'rinishi (Kashif AI Model):</strong><br>• <strong>Kunlik Tushum:</strong> 4,850,000 UZS (+14.2% o'sish)<br>• <strong>Faol Buyurtmalar:</strong> 86 ta (O'rtacha chek: 56,395 UZS)<br>• <strong>Eng faol zal:</strong> Asosiy Zal (Stol #2, #4)<br>• <strong>Tizim holati:</strong> 🟢 A+ (Barcha 10 ta stol va kassa 100% samarali ishlamoqda).",
+    forecast: "🥩 <strong>Ertangi Kun Uchun Masalliqlar Ehtiyoji Bashorati (AI Forecast):</strong><br>• <strong>Qo'y go'shti (Shashlik uchun):</strong> ~18.5 kg zarur (Bugun 312 ta sotildi)<br>• <strong>Guruch (Palov uchun):</strong> ~12 kg lazer guruchi<br>• <strong>Achichuk masalliqlari (Pomidor/Piyoz):</strong> ~8 kg<br>• <strong>Ichimliklar:</strong> Kamida 45 dona 1.5L zaxira tavsiya etiladi.",
     sales: "📊 <strong>Sotuv Analitikasi Maslahati:</strong><br>Bugungi eng xaridorgir taomimiz — <strong>'👑 Xon Shashlik (Maxsus Qo\'y)'</strong> (312 ta sotildi). Bugun o'rtacha tushum 4.8 mln UZS ga yetdi. Kechki 18:00–21:00 pik vaqtlarida <strong>'XON SHASHLIK Ziyofat SET-i'</strong> ni birinchi o'ringa sursak, kunlik tushum yana +18% ga oshadi!",
     promo: "🔥 <strong>Aksiya va Kombo Maslahati:</strong><br>Hozirgi <strong>'XON SHASHLIK Olovli Kombosi' (-25%)</strong> mijozlar orasida eng mashhur. Maslahatim: Ish kunlari 12:00 dan 16:00 gacha <strong>'Ekspress Grill Seti'</strong> ga bepul limonli choy qo'shish taklifi berilsa, tushlik tushumi 30% ga o'sadi.",
     kds: "⚡ <strong>Oshxona (KDS) Tezligi Tahlili:</strong><br>Hozirda pishirilayotgan buyurtmalar 2 ta. O'rtacha tayyorlanish vaqti — <strong>12-14 daqiqa</strong>. Oshpazlarga tavsiya: Qo'y qiyma shashliklarni oldindan tayyorlab turish buyurtma topshirish vaqtini 5 minutga qisqartiradi!",
@@ -1168,6 +1335,8 @@ function askAiAgent(topic) {
   };
 
   const userLabels = {
+    health: "🏆 Restoran biznes salomatligi hisoboti",
+    forecast: "🥩 Ertangi kun uchun masalliqlar bashorati",
     sales: "💡 Sotuvni oshirish bo'yicha maslahat bering",
     promo: "🔥 Qanday yangi aksiya qilishni tavsiya etasiz?",
     kds: "⚡ Oshxona va KDS tezligini qanday oshiramiz?",
