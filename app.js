@@ -144,6 +144,39 @@ let orders = [
   }
 ];
 
+let activeKdsOrderCategory = 'Barchasi';
+let orderCategoriesList = [
+  { id: 'cat_1', name: "🍽 Zal (Stolda)", placeholder: "Stol #1" },
+  { id: 'cat_2', name: "👑 VIP Xona", placeholder: "VIP Xona #1" },
+  { id: 'cat_3', name: "🛍 Olib ketish", placeholder: "Mijoz: Anvar (+99890...)" },
+  { id: 'cat_4', name: "🛵 Yetkazib berish (Dostavka)", placeholder: "Manzil: Chilonzor 9, tel:..." },
+  { id: 'cat_5', name: "🌿 Yozgi Ayvon", placeholder: "Ayvon #1" }
+];
+
+function renderPosOrderCategoriesDropdown() {
+  const select = document.getElementById('select-order-category');
+  if (!select) return;
+  select.innerHTML = orderCategoriesList.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('');
+}
+
+function onOrderCategoryChange() {
+  const select = document.getElementById('select-order-category');
+  const label = document.getElementById('order-detail-label');
+  const input = document.getElementById('order-detail-input');
+  if (!select || !input) return;
+
+  const selectedName = select.value;
+  const cat = orderCategoriesList.find(c => c.name === selectedName);
+
+  if (cat) {
+    if (label) label.innerText = selectedName.includes('Dostavka') ? 'Yetkazish Manzili & Tel:' : (selectedName.includes('Olib ketish') ? 'Mijoz Ismi va Tel:' : 'Stol / VIP Xona Raqami:');
+    input.placeholder = cat.placeholder || 'Stol #1';
+    if (!input.value || input.value.startsWith('Stol #') || input.value.startsWith('VIP') || input.value.startsWith('Ayvon') || input.value.startsWith('Mijoz') || input.value.startsWith('Manzil')) {
+      input.value = cat.placeholder;
+    }
+  }
+}
+
 function initApp() {
   initSavedFont();
   startClock();
@@ -701,20 +734,43 @@ function selectPosCategory(cat) {
 
 function renderPosMenu() {
   const container = document.getElementById('pos-menu-grid');
-  const searchVal = document.getElementById('pos-search')?.value.toLowerCase() || '';
+  if (!container) return;
+  const searchVal = document.getElementById('pos-search')?.value.toLowerCase().trim() || '';
 
   const filtered = menuData.filter(dish => {
     const matchesCat = activeCategory === 'Barchasi' || dish.category === activeCategory;
-    const matchesSearch = dish.name.toLowerCase().includes(searchVal);
+    const matchesSearch = !searchVal || dish.name.toLowerCase().includes(searchVal);
     return matchesCat && matchesSearch;
   });
 
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; background: var(--bg-card); border-radius: var(--radius-md); border: 1px dashed var(--border-color); color: var(--text-muted);">
+        <div style="font-size: 28px; margin-bottom: 8px;">🔍</div>
+        <p style="font-weight: 700; font-size: 14px; color: #fff;">Taom topilmadi.</p>
+        <small style="color: var(--text-dim);">Qidiruv so'zini tozalang yoki boshqa toifani tanlang.</small>
+      </div>
+    `;
+    return;
+  }
+
   container.innerHTML = filtered.map(dish => `
     <div class="menu-card" onclick="addToCart(${dish.id})">
-      <img src="${dish.img}" onerror="this.onerror=null; this.src='assets/shashlik.jpg'" class="menu-card-img" alt="${dish.name}" style="height: 125px; width: 100%; object-fit: cover;">
+      <div style="position: relative; overflow: hidden;">
+        <img src="${dish.img}" onerror="this.onerror=null; this.src='assets/shashlik.jpg'" class="menu-card-img" alt="${dish.name}">
+        <span style="position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); color: var(--accent-gold); font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255, 183, 3, 0.4);">
+          ${dish.salesCount || 120}+ ta
+        </span>
+      </div>
       <div class="menu-card-body">
-        <div class="menu-card-title">${dish.name}</div>
-        <div class="menu-card-price">${dish.price.toLocaleString()} UZS</div>
+        <div>
+          <div class="menu-card-title">${dish.name}</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">${dish.category}</div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+          <div class="menu-card-price">${dish.price.toLocaleString()} UZS</div>
+          <button class="btn-primary" style="padding: 4px 10px; font-size: 11px; border-radius: 6px; font-weight: 700;" onclick="event.stopPropagation(); addToCart(${dish.id})">+ Qo'shish</button>
+        </div>
       </div>
     </div>
   `).join('');
